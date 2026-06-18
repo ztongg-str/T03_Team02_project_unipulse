@@ -1,0 +1,5 @@
+-- TODO: Write CREATE TABLE statements for all tables
+-- users, events, registrations, friends,
+-- achievements, user_achievements, streaks,
+-- activity_logs, reports
+-- Include: primary keys, foreign keys, unique constraints, indexes

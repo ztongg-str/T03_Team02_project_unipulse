@@ -1,0 +1,11 @@
+// TODO: Create events controller
+// - getAllEvents(req, res)
+// - getUpcomingEvents(req, res)
+// - getMyEvents(req, res)
+// - getEventById(req, res)
+// - createEvent(req, res)
+// - updateEvent(req, res)
+// - deleteEvent(req, res)
+// - approveEvent(req, res)
+// - rejectEvent(req, res)
+// - banEvent(req, res)
