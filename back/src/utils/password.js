@@ -1,3 +1,10 @@
-// TODO: Create password utility functions
-// - hashPassword(plainPassword): hash with bcrypt
-// - comparePassword(plainPassword, hashedPassword): compare with bcrypt
+import bcrypt from 'bcrypt';
+import env from '../config/env.js';
+
+export const hashPassword = async (plainPassword) => {
+  return bcrypt.hash(plainPassword, env.bcryptRounds);
+};
+
+export const comparePassword = async (plainPassword, hashedPassword) => {
+  return bcrypt.compare(plainPassword, hashedPassword);
+};

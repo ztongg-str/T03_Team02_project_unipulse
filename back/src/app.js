@@ -1,7 +1,42 @@
-// TODO: Create Express app
-// - Import express, cors
-// - Apply cors() and express.json() middleware
-// - Define health check route: GET /api/health
-// - Mount all module routes under /api/<module>
-// - Apply notFound and errorHandler middleware
-// - Export app
+import express from 'express';
+import cors from 'cors';
+import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
+
+import authRoutes from './modules/auth/auth.routes.js';
+import usersRoutes from './modules/users/users.routes.js';
+import eventsRoutes from './modules/events/events.routes.js';
+import registrationsRoutes from './modules/registrations/registrations.routes.js';
+import friendsRoutes from './modules/friends/friends.routes.js';
+import achievementsRoutes from './modules/achievements/achievements.routes.js';
+import streaksRoutes from './modules/streaks/streaks.routes.js';
+import activityLogsRoutes from './modules/activityLogs/activityLogs.routes.js';
+import reportsRoutes from './modules/reports/reports.routes.js';
+import adminRoutes from './modules/admin/admin.routes.js';
+import backupRoutes from './modules/backup/backup.routes.js';
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, message: 'UniPulse API is running' });
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/registrations', registrationsRoutes);
+app.use('/api/friends', friendsRoutes);
+app.use('/api/achievements', achievementsRoutes);
+app.use('/api/streaks', streaksRoutes);
+app.use('/api/activity-logs', activityLogsRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/backup', backupRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
+
+export default app;

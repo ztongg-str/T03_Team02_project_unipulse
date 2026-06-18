@@ -1,3 +1,9 @@
-// TODO: Create activity logs service
-// - getMyActivityLogs(userId): list user's recent activity logs
-// - logActivity(userId, action, details): insert activity log
+import * as activityLogsRepository from './activityLogs.repository.js';
+
+export const getMyActivityLogs = async (userId) => {
+  return activityLogsRepository.findByUserId(userId);
+};
+
+export const logActivity = async (userId, action, details) => {
+  await activityLogsRepository.create(userId, action, details);
+};

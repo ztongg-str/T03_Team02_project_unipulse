@@ -1,3 +1,12 @@
-// TODO: Create and export a simple logger utility
-// - info(), warn(), error(), debug() methods
-// - Debug should only log when NODE_ENV is not 'production'
+const logger = {
+  info: (...args) => console.log('[INFO]', ...args),
+  warn: (...args) => console.warn('[WARN]', ...args),
+  error: (...args) => console.error('[ERROR]', ...args),
+  debug: (...args) => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[DEBUG]', ...args);
+    }
+  },
+};
+
+export default logger;

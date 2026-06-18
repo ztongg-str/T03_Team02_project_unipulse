@@ -1,4 +1,13 @@
-// TODO: Create role-based authorization middleware
-// - Accept allowed roles as arguments (...allowedRoles)
-// - Check req.user.role against allowed roles
-// - Return 401 if not authenticated, 403 if forbidden
+import { error } from '../utils/response.js';
+
+export const authorize = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return error(res, 'Authentication required.', 401);
+    }
+    if (!allowedRoles.includes(req.user.role)) {
+      return error(res, 'Forbidden. You do not have permission.', 403);
+    }
+    next();
+  };
+};

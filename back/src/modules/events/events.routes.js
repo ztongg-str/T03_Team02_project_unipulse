@@ -1,11 +1,29 @@
-// TODO: Define events routes
-// GET / - authenticate
-// GET /upcoming - authenticate
-// GET /my - authenticate, authorize('organizer')
-// GET /:id - authenticate
-// POST / - authenticate, authorize('organizer', 'admin'), validate body
-// PUT /:id - authenticate, authorize('organizer', 'admin')
-// DELETE /:id - authenticate, authorize('organizer', 'admin')
-// PATCH /:id/approve - authenticate, authorize('admin')
-// PATCH /:id/reject - authenticate, authorize('admin')
-// PATCH /:id/ban - authenticate, authorize('admin')
+import { Router } from 'express';
+import * as eventsController from './events.controller.js';
+import { authenticate } from '../../middlewares/authMiddleware.js';
+import { authorize } from '../../middlewares/roleMiddleware.js';
+import { validate, required, minLength } from '../../middlewares/validationMiddleware.js';
+
+const router = Router();
+
+const createEventSchema = {
+  body: {
+    title: [required, minLength(3)],
+    description: [required, minLength(10)],
+    date: [required],
+    location: [required],
+    category: [required],
+    maxParticipants: [required],
+  },
+};
+
+router.get('/', authenticate, eventsController.getAllEvents);
+router.get('/upcoming', authenticate, eventsController.getUpcomingEvents);
+router.get('/my', authenticate, authorize('organizer'), eventsController.getMyEvents);
+router.get('/:id', authenticate, eventsController.getEventById);
+router.post('/', authenticate, authorize('organizer'), validate(createEventSchema), eventsController.createEvent);
+router.put('/:id', authenticate, authorize('organizer'), eventsController.updateEvent);
+router.delete('/:id', authenticate, authorize('organizer'), eventsController.deleteEvent);
+router.patch('/:id/approve', authenticate, authorize('organizer'), eventsController.approveEvent);
+
+export default router;

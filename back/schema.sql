@@ -1,5 +1,112 @@
--- TODO: Write CREATE TABLE statements for all tables
--- users, events, registrations, friends,
--- achievements, user_achievements, streaks,
--- activity_logs, reports
--- Include: primary keys, foreign keys, unique constraints, indexes
+CREATE DATABASE IF NOT EXISTS unipulse;
+USE unipulse;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  fullName VARCHAR(100) NOT NULL,
+  role ENUM('student', 'organizer') NOT NULL DEFAULT 'student',
+  avatar VARCHAR(255) DEFAULT NULL,
+  bio TEXT DEFAULT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS events (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  date DATETIME NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  category VARCHAR(100) NOT NULL,
+  maxParticipants INT NOT NULL DEFAULT 100,
+  image VARCHAR(255) DEFAULT NULL,
+  status ENUM('pending', 'approved') NOT NULL DEFAULT 'pending',
+  organizerId INT NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (organizerId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS registrations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL,
+  eventId INT NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (eventId) REFERENCES events(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_registration (userId, eventId)
+);
+
+CREATE TABLE IF NOT EXISTS friends (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL,
+  friendId INT NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (friendId) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_friendship (userId, friendId)
+);
+
+CREATE TABLE IF NOT EXISTS achievements (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT DEFAULT NULL,
+  icon VARCHAR(255) DEFAULT NULL,
+  criteria VARCHAR(255) DEFAULT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_achievements (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL,
+  achievementId INT NOT NULL,
+  earnedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (achievementId) REFERENCES achievements(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user_achievement (userId, achievementId)
+);
+
+CREATE TABLE IF NOT EXISTS streaks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL UNIQUE,
+  currentStreak INT NOT NULL DEFAULT 0,
+  longestStreak INT NOT NULL DEFAULT 0,
+  lastActivity DATE DEFAULT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL,
+  action VARCHAR(100) NOT NULL,
+  details TEXT DEFAULT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS reports (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  reporterId INT NOT NULL,
+  targetType ENUM('user', 'event') NOT NULL,
+  targetId INT NOT NULL,
+  reason VARCHAR(255) NOT NULL,
+  description TEXT DEFAULT NULL,
+  status ENUM('pending', 'resolved') NOT NULL DEFAULT 'pending',
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (reporterId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_users_role ON users(role);
+CREATE INDEX idx_events_status ON events(status);
+CREATE INDEX idx_events_date ON events(date);
+CREATE INDEX idx_events_organizer ON events(organizerId);
+CREATE INDEX idx_registrations_user ON registrations(userId);
+CREATE INDEX idx_registrations_event ON registrations(eventId);
+CREATE INDEX idx_activity_logs_user ON activity_logs(userId);
+CREATE INDEX idx_reports_status ON reports(status);

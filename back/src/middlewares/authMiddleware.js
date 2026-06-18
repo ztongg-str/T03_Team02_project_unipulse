@@ -1,5 +1,17 @@
-// TODO: Create authentication middleware
-// - Extract Bearer token from Authorization header
-// - Verify JWT token using utility
-// - Attach decoded user (id, role) to req.user
-// - Return 401 if token missing or invalid
+import { verifyToken } from '../utils/jwt.js';
+import { error } from '../utils/response.js';
+
+export const authenticate = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return error(res, 'Access denied. No token provided.', 401);
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyToken(token);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return error(res, 'Invalid or expired token.', 401);
+  }
+};

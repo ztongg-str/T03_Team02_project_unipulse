@@ -1,4 +1,7 @@
-// TODO: Create server entry point
-// - Import app and env
-// - Listen on env.port
-// - Log startup message
+import app from './app.js';
+import env from './config/env.js';
+import logger from './config/logger.js';
+
+app.listen(env.port, () => {
+  logger.info(`UniPulse server running on port ${env.port}`);
+});
