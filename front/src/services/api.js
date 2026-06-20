@@ -1,76 +1,95 @@
-// src/services/api.js
 import axios from "axios";
 
 const API_BASE_URL = "http://localhost:4000/api";
 
-export const getArticles = async () => {
-  const response = await axios.get(`${API_BASE_URL}/articles`);
-  return response.data;
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const authAPI = {
+  register: (data) => api.post("/auth/register", data).then((r) => r.data),
+  login: (data) => api.post("/auth/login", data).then((r) => r.data),
+  me: () => api.get("/auth/me").then((r) => r.data),
 };
 
-export const getArticleById = async (id) => {
-  const response = await axios.get(`${API_BASE_URL}/articles/${id}`);
-  return response.data;
+export const usersAPI = {
+  getProfile: () => api.get("/users/profile").then((r) => r.data),
+  updateProfile: (data) => api.put("/users/profile", data).then((r) => r.data),
+  getUserById: (id) => api.get(`/users/${id}`).then((r) => r.data),
 };
 
-export const createArticle = async (article) => {
-  const response = await axios.post(`${API_BASE_URL}/articles`, article);
-  return response.data;
+export const uploadAPI = {
+  file: (formData) =>
+    api.post("/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data),
 };
 
-export const updateArticle = async (id, updatedData) => {
-  const response = await axios.put(`${API_BASE_URL}/articles/${id}`, updatedData);
-  return response.data;
+export const eventsAPI = {
+  getAll: (params) => api.get("/events", { params }).then((r) => r.data),
+  getUpcoming: (params) => api.get("/events/upcoming", { params }).then((r) => r.data),
+  getById: (id) => api.get(`/events/${id}`).then((r) => r.data),
+  create: (data) => api.post("/events", data).then((r) => r.data),
+  update: (id, data) => api.put(`/events/${id}`, data).then((r) => r.data),
 };
 
-export const removeArticle = async (id) => {
-  const response = await axios.delete(`${API_BASE_URL}/articles/${id}`);
-  return response.data;
+export const registrationsAPI = {
+  register: (eventId) => api.post("/registrations", { eventId }).then((r) => r.data),
+  cancel: (id) => api.delete(`/registrations/${id}`).then((r) => r.data),
+  getMy: () => api.get("/registrations/my").then((r) => r.data),
 };
 
+export const friendsAPI = {
+  getMy: () => api.get("/friends").then((r) => r.data),
+  search: (q) => api.get("/friends/search", { params: { q } }).then((r) => r.data),
+  add: (userId) => api.post(`/friends/add/${userId}`).then((r) => r.data),
+  remove: (id) => api.delete(`/friends/${id}`).then((r) => r.data),
+  getProfile: (userId) => api.get(`/friends/profile/${userId}`).then((r) => r.data),
+};
 
-// OLD VERSION - MOCK
+export const achievementsAPI = {
+  getMy: () => api.get("/achievements").then((r) => r.data),
+  getAllWithStatus: () => api.get("/achievements/status").then((r) => r.data),
+};
 
-// let articles = [
-//   {
-//     id: "1",
-//     title: "React Basics",
-//     content: "Learn React",
-//     journalist: "Alice",
-//     category: "Frontend",
-//   },
-//   {
-//     id: "2",
-//     title: "Routing",
-//     content: "React Router",
-//     journalist: "Bob",
-//     category: "Frontend",
-//   },
-// ];
+export const streaksAPI = {
+  getMy: () => api.get("/streaks").then((r) => r.data),
+};
 
-// export function getArticles() {
-//   return articles;
-// }
+export const activityLogsAPI = {
+  getMy: () => api.get("/activity-logs").then((r) => r.data),
+};
 
-// export function getArticleById(id) {
-//   return articles.find((a) => a.id === id);
-// }
+export const historyAPI = {
+  getUpcoming: () => api.get("/history/upcoming").then((r) => r.data),
+  getPast: () => api.get("/history/past").then((r) => r.data),
+};
 
-// export function removeArticle(id) {
-//   articles = articles.filter((a) => a.id !== id);
-// }
+export const savedEventsAPI = {
+  getAll: () => api.get("/saved-events").then((r) => r.data),
+  save: (eventId) => api.post("/saved-events", { eventId }).then((r) => r.data),
+  unsave: (eventId) => api.delete(`/saved-events/${eventId}`).then((r) => r.data),
+  check: (eventId) => api.get(`/saved-events/check/${eventId}`).then((r) => r.data),
+};
 
-// export function createArticle(article) {
-//   const newArticle = { ...article, id: String(Date.now()) };
-//   articles.push(newArticle);
-//   return newArticle;
-// }
-
-// export function updateArticle(id, updatedData) {
-//   const index = articles.findIndex((a) => a.id === id);
-//   if (index !== -1) {
-//     articles[index] = { ...articles[index], ...updatedData };
-//     return articles[index];
-//   }
-//   return null;
-// }
+export default api;

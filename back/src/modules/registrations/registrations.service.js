@@ -1,5 +1,6 @@
 import * as registrationsRepository from './registrations.repository.js';
 import * as eventsRepository from '../events/events.repository.js';
+import { checkAndGrant } from '../achievements/achievements.service.js';
 
 export const registerForEvent = async (userId, eventId) => {
   const event = await eventsRepository.findById(eventId);
@@ -26,6 +27,10 @@ export const registerForEvent = async (userId, eventId) => {
     throw err;
   }
   const regId = await registrationsRepository.create(userId, eventId);
+
+  await checkAndGrant(userId, 'register_1_event');
+  await checkAndGrant(userId, 'explore_3_categories');
+
   return registrationsRepository.findById(regId);
 };
 

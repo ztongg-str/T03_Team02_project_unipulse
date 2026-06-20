@@ -1,5 +1,6 @@
 import * as friendsRepository from './friends.repository.js';
 import * as usersRepository from '../users/users.repository.js';
+import { checkAndGrant } from '../achievements/achievements.service.js';
 
 export const getMyFriends = async (userId) => {
   return friendsRepository.findByUserId(userId);
@@ -29,6 +30,10 @@ export const addFriend = async (userId, friendUserId) => {
     throw err;
   }
   const id = await friendsRepository.create(userId, friendUserId);
+
+  await checkAndGrant(userId, 'add_3_friends');
+  await checkAndGrant(userId, 'add_10_friends');
+
   return friendsRepository.findById(id);
 };
 

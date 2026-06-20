@@ -19,6 +19,15 @@ export const getAllAchievements = async (req, res, next) => {
   }
 };
 
+export const getAllWithStatus = async (req, res, next) => {
+  try {
+    const achievements = await achievementsService.getAllWithStatus(req.user.id);
+    return success(res, achievements);
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 500);
+  }
+};
+
 export const createAchievement = async (req, res, next) => {
   try {
     const achievement = await achievementsService.createAchievement(req.body);

@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { readdir } from 'fs/promises';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -16,13 +17,21 @@ const getTimestamp = () => {
   return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
 };
 
+const buildDumpCmd = (extraFlags) => {
+  const pw = env.db.password ? `-p${env.db.password}` : '';
+  return `mysqldump -h ${env.db.host} -P ${env.db.port} -u ${env.db.user} ${pw} --ssl-mode=REQUIRED ${extraFlags} ${env.db.name}`;
+};
+
+const buildRestoreCmd = () => {
+  const pw = env.db.password ? `-p${env.db.password}` : '';
+  return `mysql -h ${env.db.host} -P ${env.db.port} -u ${env.db.user} ${pw} --ssl-mode=REQUIRED ${env.db.name}`;
+};
+
 export const createFullBackup = async () => {
   const filename = `full_backup_${getTimestamp()}.sql`;
   const filepath = join(backupsDir, filename);
   try {
-    await execAsync(
-      `mysqldump -h ${env.db.host} -u ${env.db.user} ${env.db.password ? `-p${env.db.password}` : ''} ${env.db.name} > "${filepath}"`
-    );
+    await execAsync(`${buildDumpCmd('')} > "${filepath}"`);
     logger.info(`Full backup created: ${filename}`);
     return { filename, filepath, type: 'full' };
   } catch (err) {
@@ -37,9 +46,7 @@ export const createIncrementalBackup = async () => {
   const filename = `incremental_backup_${getTimestamp()}.sql`;
   const filepath = join(backupsDir, filename);
   try {
-    await execAsync(
-      `mysqldump --no-create-info -h ${env.db.host} -u ${env.db.user} ${env.db.password ? `-p${env.db.password}` : ''} ${env.db.name} > "${filepath}"`
-    );
+    await execAsync(`${buildDumpCmd('--no-create-info')} > "${filepath}"`);
     logger.info(`Incremental backup created: ${filename}`);
     return { filename, filepath, type: 'incremental' };
   } catch (err) {
@@ -58,9 +65,7 @@ export const restoreBackup = async (backupFile) => {
   }
   const filepath = join(backupsDir, backupFile);
   try {
-    await execAsync(
-      `mysql -h ${env.db.host} -u ${env.db.user} ${env.db.password ? `-p${env.db.password}` : ''} ${env.db.name} < "${filepath}"`
-    );
+    await execAsync(`${buildRestoreCmd()} < "${filepath}"`);
     logger.info(`Backup restored: ${backupFile}`);
   } catch (err) {
     logger.error('Restore failed:', err.message);

@@ -1,4 +1,5 @@
 import * as usersRepository from './users.repository.js';
+import { checkAndGrant } from '../achievements/achievements.service.js';
 
 export const getProfile = async (userId) => {
   const user = await usersRepository.findById(userId);
@@ -11,7 +12,7 @@ export const getProfile = async (userId) => {
 };
 
 export const updateProfile = async (userId, data) => {
-  const allowedFields = ['fullName', 'avatar', 'bio'];
+  const allowedFields = ['fullName', 'avatar', 'cover_image', 'bio'];
   const updates = {};
   for (const key of allowedFields) {
     if (data[key] !== undefined) updates[key] = data[key];
@@ -22,6 +23,9 @@ export const updateProfile = async (userId, data) => {
     throw err;
   }
   await usersRepository.update(userId, updates);
+
+  await checkAndGrant(userId, 'complete_profile');
+
   return usersRepository.findById(userId);
 };
 

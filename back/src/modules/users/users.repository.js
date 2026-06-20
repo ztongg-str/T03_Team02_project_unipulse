@@ -2,7 +2,7 @@ import pool from '../../config/database.js';
 
 export const findById = async (id) => {
   const [rows] = await pool.query(
-    'SELECT id, username, email, fullName, role, avatar, bio, createdAt FROM users WHERE id = ?',
+    'SELECT id, username, email, fullName, role, avatar, cover_image, bio, createdAt FROM users WHERE id = ?',
     [id]
   );
   return rows[0] || null;
@@ -31,7 +31,7 @@ export const findAll = async ({ page = 1, limit = 20, role, search }) => {
   }
 
   const [rows] = await pool.query(
-    `SELECT id, username, email, fullName, role, avatar, createdAt FROM users WHERE ${where} LIMIT ? OFFSET ?`,
+    `SELECT id, username, email, fullName, role, avatar, cover_image, createdAt FROM users WHERE ${where} LIMIT ? OFFSET ?`,
     [...params, Number(limit), Number(offset)]
   );
 
