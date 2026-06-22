@@ -6,7 +6,7 @@ import { authorize } from '../../middlewares/roleMiddleware.js';
 const router = Router();
 
 router.post('/', authenticate, registrationsController.registerForEvent);
-router.delete('/:id', authenticate, registrationsController.cancelRegistration);
+router.delete('/event/:eventId', authenticate, registrationsController.cancelRegistration);
 router.get('/my', authenticate, registrationsController.getMyRegistrations);
 router.get('/event/:eventId', authenticate, authorize('organizer'), registrationsController.getEventRegistrations);
 

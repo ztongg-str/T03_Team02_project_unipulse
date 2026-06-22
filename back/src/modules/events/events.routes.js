@@ -19,11 +19,11 @@ const createEventSchema = {
 
 router.get('/', authenticate, eventsController.getAllEvents);
 router.get('/upcoming', authenticate, eventsController.getUpcomingEvents);
-router.get('/my', authenticate, authorize('organizer'), eventsController.getMyEvents);
+router.get('/my', authenticate, eventsController.getMyEvents);
 router.get('/:id', authenticate, eventsController.getEventById);
-router.post('/', authenticate, authorize('organizer'), validate(createEventSchema), eventsController.createEvent);
-router.put('/:id', authenticate, authorize('organizer'), eventsController.updateEvent);
-router.delete('/:id', authenticate, authorize('organizer'), eventsController.deleteEvent);
-router.patch('/:id/approve', authenticate, authorize('organizer'), eventsController.approveEvent);
+router.post('/', authenticate, validate(createEventSchema), eventsController.createEvent);
+router.put('/:id', authenticate, eventsController.updateEvent);
+router.delete('/:id', authenticate, eventsController.deleteEvent);
+router.patch('/:id/approve', authenticate, authorize('admin'), eventsController.approveEvent);
 
 export default router;

@@ -18,10 +18,6 @@ export const findAll = async ({ page = 1, limit = 20, category, status, search }
     const s = `%${search}%`;
     params.push(s, s);
   }
-  if (user.role === 'student') {
-    where += ' AND status = ?';
-    params.push('approved');
-  }
 
   const [rows] = await pool.query(
     `SELECT e.*, u.fullName as organizerName

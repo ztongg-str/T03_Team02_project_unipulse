@@ -11,6 +11,17 @@ export const getPastHistory = async (userId) => {
   return historyRepository.findPastByUser(userId);
 };
 
+export const moveExpiredEvents = async (userId) => {
+  const expired = await historyRepository.findExpiredRegistrations(userId);
+  let moved = 0;
+  for (const reg of expired) {
+    await historyRepository.moveRegistrationToPast(reg);
+    await historyRepository.removeUpcomingRegistration(reg.userId, reg.eventId);
+    moved++;
+  }
+  return { moved };
+};
+
 export const markAttendance = async (registrationId, organizerId, attended) => {
   const registration = await registrationsRepository.findById(registrationId);
   if (!registration) {

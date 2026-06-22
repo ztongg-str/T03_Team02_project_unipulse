@@ -83,6 +83,7 @@ export const activityLogsAPI = {
 export const historyAPI = {
   getUpcoming: () => api.get("/history/upcoming").then((r) => r.data),
   getPast: () => api.get("/history/past").then((r) => r.data),
+  moveExpired: () => api.post("/history/move-expired").then((r) => r.data),
 };
 
 export const savedEventsAPI = {

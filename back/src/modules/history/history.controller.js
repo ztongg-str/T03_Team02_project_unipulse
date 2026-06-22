@@ -19,6 +19,15 @@ export const getPastHistory = async (req, res, next) => {
   }
 };
 
+export const moveExpiredEvents = async (req, res, next) => {
+  try {
+    const result = await historyService.moveExpiredEvents(req.user.id);
+    return success(res, result, 'Expired events moved');
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 500);
+  }
+};
+
 export const markAttendance = async (req, res, next) => {
   try {
     const { registrationId, attended } = req.body;
@@ -28,3 +37,4 @@ export const markAttendance = async (req, res, next) => {
     return error(res, err.message, err.statusCode || 400);
   }
 };
+

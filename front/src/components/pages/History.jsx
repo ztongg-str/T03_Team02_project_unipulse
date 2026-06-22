@@ -7,6 +7,7 @@ export default function History() {
   const [past, setPast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [movedNotice, setMovedNotice] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -14,13 +15,22 @@ export default function History() {
 
   const fetchData = async () => {
     try {
+      const moveRes = await historyAPI.moveExpired();
+      if (moveRes?.data?.moved > 0) {
+        setMovedNotice(moveRes.data.moved);
+      }
+    } catch (err) {
+      console.error("moveExpired failed:", err);
+    }
+    try {
       const [upRes, pastRes] = await Promise.all([
         historyAPI.getUpcoming(),
         historyAPI.getPast(),
       ]);
       setUpcoming(upRes.data || []);
       setPast(pastRes.data || []);
-    } catch {
+    } catch (err) {
+      console.error("Failed to fetch history:", err);
     } finally {
       setLoading(false);
     }
@@ -178,6 +188,12 @@ export default function History() {
 
   if (loading) return <div className="loading">Loading...</div>;
 
+  const handleRefresh = async () => {
+    setLoading(true);
+    setMovedNotice(null);
+    await fetchData();
+  };
+
   return (
     <div className="page-container history-page">
       {/* Hero Section */}
@@ -185,6 +201,22 @@ export default function History() {
         <h1 className="history-hero-title">Event History</h1>
         <p className="history-hero-sub">Manage your registrations and relive past campus moments.</p>
       </section>
+
+      {/* Moved notification */}
+      {movedNotice && (
+        <div className="history-notice">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="9" stroke="#FF7A00" strokeWidth="1.5" />
+            <path d="M10 6V11M10 13V14" stroke="#FF7A00" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          <span>{movedNotice} event{movedNotice > 1 ? "s have" : " has"} passed &mdash; check your Past Events below.</span>
+          <button className="history-notice-dismiss" onClick={() => setMovedNotice(null)}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 2L12 12M12 2L2 12" stroke="#85736E" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Upcoming Events */}
       <section className="history-section">
@@ -233,6 +265,14 @@ export default function History() {
             </button>
           </div>
         </div>
+
+        <button className="history-refresh-btn" onClick={handleRefresh}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M14 8C14 11.3137 11.3137 14 8 14C4.68629 14 2 11.3137 2 8C2 4.68629 4.68629 2 8 2C10.5 2 12.5 3.5 13.5 5.5" stroke="#FF7A00" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M9.5 2H13.5V6" stroke="#FF7A00" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Refresh
+        </button>
 
         {filteredPast.length === 0 ? (
           <div className="history-empty">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { eventsAPI, registrationsAPI } from "../../services/api";
+import { eventsAPI, registrationsAPI, historyAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 export default function OrganizerDashboard() {
@@ -15,6 +15,7 @@ export default function OrganizerDashboard() {
 
   const fetchData = async () => {
     try {
+      await historyAPI.moveExpired();
       const [eventsRes, regRes] = await Promise.allSettled([
         eventsAPI.getAll(),
         registrationsAPI.getMy(),
@@ -40,8 +41,8 @@ export default function OrganizerDashboard() {
   };
 
   const totalEvents = events.length;
-  const pendingEvents = events.filter(e => e.status === "pending").length;
-  const approvedEvents = events.filter(e => e.status === "approved" || e.status === "active").length;
+  const pendingEvents = events.filter(e => e.status === "pending" && new Date(e.date) > now).length;
+  const approvedEvents = events.filter(e => (e.status === "approved" || e.status === "active") && new Date(e.date) > now).length;
 
   const stats = [
     { label: "Total Events", value: totalEvents, icon: "calendar", color: "#FF7A00", bg: "rgba(255,122,0,0.1)" },
@@ -68,8 +69,13 @@ export default function OrganizerDashboard() {
     return <span className={`badge ${s.className}`}>{s.label}</span>;
   };
 
-  const upcomingEvents = events
-    .filter(e => e.status !== "cancelled" && e.status !== "rejected")
+  const now = new Date();
+  const activeEvents = events
+    .filter(e => e.status !== "cancelled" && e.status !== "rejected" && new Date(e.date) > now)
+    .slice(0, 5);
+  const pastCreatedEvents = events
+    .filter(e => e.status !== "cancelled" && e.status !== "rejected" && new Date(e.date) <= now)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
 
   const notifications = [
@@ -141,12 +147,12 @@ export default function OrganizerDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {upcomingEvents.length === 0 ? (
+                {activeEvents.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="org-table-empty">No events yet. Create your first event!</td>
+                    <td colSpan={4} className="org-table-empty">No upcoming events.</td>
                   </tr>
                 ) : (
-                  upcomingEvents.map((ev) => (
+                  activeEvents.map((ev) => (
                     <tr key={ev.id}>
                       <td>
                         <div className="org-table-event-name">{ev.title}</div>
@@ -193,6 +199,50 @@ export default function OrganizerDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Past Events */}
+      <div className="org-section-card">
+        <div className="org-section-header">
+          <h2 className="org-section-title">Past Events</h2>
+        </div>
+        <div className="org-table-wrapper">
+          <table className="org-table">
+            <thead>
+              <tr>
+                <th>Event Name</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pastCreatedEvents.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="org-table-empty">No past events yet.</td>
+                </tr>
+              ) : (
+                pastCreatedEvents.map((ev) => (
+                  <tr key={ev.id}>
+                    <td>
+                      <div className="org-table-event-name">{ev.title}</div>
+                    </td>
+                    <td className="org-table-date">{formatDate(ev.date)}</td>
+                    <td><span className="badge badge-orange">Ended</span></td>
+                    <td>
+                      <Link to={`/events/${ev.id}`} className="org-action-btn" title="View">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path d="M8 3C5 3 2.5 5 1 8c1.5 3 4 5 7 5s6-2 7-5c-1-3-3.5-5-7-5z" stroke="currentColor" strokeWidth="2"/>
+                          <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="2"/>
+                        </svg>
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

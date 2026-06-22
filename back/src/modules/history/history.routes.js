@@ -7,6 +7,7 @@ const router = Router();
 
 router.get('/upcoming', authenticate, historyController.getUpcomingEvents);
 router.get('/past', authenticate, historyController.getPastHistory);
+router.post('/move-expired', authenticate, historyController.moveExpiredEvents);
 router.put('/attendance', authenticate, authorize('organizer'), historyController.markAttendance);
 
 export default router;

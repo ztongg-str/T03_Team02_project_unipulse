@@ -44,6 +44,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {user ? (
               <>
+                <Link to="/organizer/create-event" className="btn btn-primary btn-small">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr-1">
+                    <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  Create Event
+                </Link>
                 <Link to="/profile" className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full border-2 border-orange bg-orange text-white flex items-center justify-center text-base font-bold overflow-hidden">
                     {user.avatar ? (

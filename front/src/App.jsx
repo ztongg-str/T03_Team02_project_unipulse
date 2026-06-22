@@ -17,6 +17,7 @@ import ActivityLog from "./components/pages/ActivityLog";
 import About from "./components/pages/About";
 import History from "./components/pages/History";
 import OrganizerDashboard from "./components/pages/OrganizerDashboard";
+import CreateEvent from "./components/pages/CreateEvent";
 
 function HomeRedirect() {
   const { user } = useAuth();
@@ -61,7 +62,7 @@ function App() {
             {/* Organizer Routes */}
             <Route path="/organizer/dashboard" element={<ProtectedRoute><OrganizerDashboard /></ProtectedRoute>} />
             <Route path="/organizer/my-events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
-            <Route path="/organizer/create-event" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+            <Route path="/organizer/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
             <Route path="/organizer/reports" element={<ProtectedRoute><Events /></ProtectedRoute>} />
             <Route path="/organizer/settings" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 

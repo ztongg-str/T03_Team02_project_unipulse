@@ -14,6 +14,38 @@ export const findUpcomingByUser = async (userId) => {
   return rows;
 };
 
+export const findExpiredRegistrations = async (userId) => {
+  const [rows] = await pool.query(
+    `SELECT r.id as registrationId, r.userId, r.eventId
+     FROM registrations r
+     JOIN events e ON r.eventId = e.id
+     WHERE r.userId = ?
+       AND e.date <= NOW()
+       AND NOT EXISTS (
+         SELECT 1 FROM past_event_history peh
+         WHERE peh.userId = r.userId AND peh.eventId = r.eventId
+       )`,
+    [userId]
+  );
+  return rows;
+};
+
+export const moveRegistrationToPast = async (reg) => {
+  const [result] = await pool.query(
+    `INSERT INTO past_event_history (userId, eventId, registrationId, attended, xpEarned, status)
+     VALUES (?, ?, ?, FALSE, 0, 'missed')`,
+    [reg.userId, reg.eventId, reg.registrationId]
+  );
+  return result.insertId;
+};
+
+export const removeUpcomingRegistration = async (userId, eventId) => {
+  await pool.query(
+    'DELETE FROM upcoming_events WHERE userId = ? AND eventId = ?',
+    [userId, eventId]
+  );
+};
+
 export const findPastByUser = async (userId) => {
   const [rows] = await pool.query(
     `SELECT peh.id, peh.userId, peh.eventId, peh.registrationId,
@@ -63,3 +95,5 @@ export const removeUpcoming = async (userId, eventId) => {
     [userId, eventId]
   );
 };
+
+
