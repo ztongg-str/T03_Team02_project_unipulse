@@ -27,3 +27,12 @@ export const getMe = async (req, res, next) => {
     return error(res, err.message, err.statusCode || 500);
   }
 };
+
+export const switchRole = async (req, res, next) => {
+  try {
+    const result = await authService.switchRole(req.user.id);
+    return success(res, result, 'Role switched successfully');
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 400);
+  }
+};

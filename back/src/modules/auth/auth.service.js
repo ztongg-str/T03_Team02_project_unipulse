@@ -2,7 +2,7 @@ import * as authRepository from './auth.repository.js';
 import { generateToken } from '../../utils/jwt.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
 
-export const register = async ({ username, email, password, fullName, role }) => {
+export const register = async ({ username, email, password, fullName }) => {
   const existingUser = await authRepository.findByEmail(email);
   if (existingUser) {
     const err = new Error('Email already registered');
@@ -18,20 +18,18 @@ export const register = async ({ username, email, password, fullName, role }) =>
   }
 
   const hashedPassword = await hashPassword(password);
-  const userRole = role === 'organizer' ? 'organizer' : 'student';
   const userId = await authRepository.createUser({
     username,
     email,
     password: hashedPassword,
-    fullName,
-    role: userRole,
+    fullName
   });
 
-  const token = generateToken({ id: userId, role: userRole });
+  const token = generateToken({ id: userId, role: 'student' });
 
   return {
     token,
-    user: { id: userId, username, email, fullName, role: userRole },
+    user: { id: userId, username, email, fullName, role: 'student' },
   };
 };
 
@@ -72,4 +70,29 @@ export const getMe = async (userId) => {
     throw err;
   }
   return user;
+};
+
+export const switchRole = async (userId) => {
+  const user = await authRepository.findById(userId);
+  if (!user) {
+    const err = new Error('User not found');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const newRole = user.role === 'student' ? 'organizer' : 'student';
+  await authRepository.updateRole(userId, newRole);
+
+  const token = generateToken({ id: user.id, role: newRole });
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      fullName: user.fullName,
+      role: newRole,
+    },
+  };
 };

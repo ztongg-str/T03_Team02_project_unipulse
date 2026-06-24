@@ -31,13 +31,12 @@ export default function Register() {
     setLoading(true);
     try {
       await register({
-        username: form.username || form.fullName.toLowerCase().replace(/\s+/g, ""),
+        username: form.username,
         email: form.email,
         fullName: form.fullName,
         password: form.password,
-        role: form.role,
       });
-      navigate(form.role === "organizer" ? "/organizer/dashboard" : "/events");
+      navigate("/events");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
     } finally {
@@ -81,35 +80,6 @@ export default function Register() {
           <p className="auth-form-subtitle">Get started with your campus-wide experience.</p>
 
           {error && <div className="alert alert-error">{error}</div>}
-
-          {/* Role Toggle */}
-          <div className="role-toggle-wrapper">
-            <div className="role-toggle">
-              <button
-                type="button"
-                className={`role-toggle-btn ${form.role === "student" ? "active" : ""}`}
-                onClick={() => setForm({ ...form, role: "student" })}
-              >
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 2l7 5v7l-7 5-7-5V7l7-5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-                Student
-              </button>
-              <button
-                type="button"
-                className={`role-toggle-btn ${form.role === "organizer" ? "active" : ""}`}
-                onClick={() => setForm({ ...form, role: "organizer" })}
-              >
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <rect x="3" y="5" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M7 5V3h6v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <circle cx="10" cy="10" r="2" fill="currentColor"/>
-                </svg>
-                Organizer
-              </button>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit}>
             <div className="auth-input-group">

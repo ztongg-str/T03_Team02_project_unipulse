@@ -2479,70 +2479,47 @@ input, textarea, select { font-family: inherit; outline: none; }
 }
 
 .org-sidebar-footer {
-  padding: 16px 12px;
+  padding: 12px;
   border-top: 1px solid var(--color-border-color);
-}
-
-.org-sidebar-user {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px;
-  border-radius: 10px;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.org-sidebar-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-orange);
-  color: white;
+.org-sidebar-switch-btn,
+.org-sidebar-logout-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 15px;
-  flex-shrink: 0;
-}
-
-.org-sidebar-user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.org-sidebar-user-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-charcoal);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.org-sidebar-user-role {
-  font-size: 12px;
-  color: var(--color-americano);
-}
-
-.org-sidebar-logout {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  margin-top: 8px;
   padding: 10px 16px;
   width: 100%;
-  background: none;
   border: none;
   border-radius: 10px;
   font-family: var(--font);
   font-size: 14px;
-  font-weight: 500;
-  color: var(--color-judge-gray);
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.15s;
 }
 
-.org-sidebar-logout:hover {
+.org-sidebar-switch-btn {
+  background: var(--color-orange-bg);
+  color: var(--color-orange);
+}
+
+.org-sidebar-switch-btn:hover {
+  background: var(--color-orange);
+  color: white;
+}
+
+.org-sidebar-logout-btn {
+  background: none;
+  color: var(--color-judge-gray);
+  font-weight: 500;
+}
+
+.org-sidebar-logout-btn:hover {
   background: var(--color-pink-bg);
   color: var(--color-pink);
 }
@@ -2938,6 +2915,204 @@ input, textarea, select { font-family: inherit; outline: none; }
 .badge-danger {
   background: var(--color-pink-bg);
   color: #C71F3F;
+}
+
+/* Organizer My Events */
+.org-my-events {
+  margin-bottom: 32px;
+}
+
+.org-myevents-status-filters {
+  display: flex;
+  gap: 6px;
+}
+
+.org-myevents-filter-btn {
+  padding: 6px 16px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border-color);
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
+  color: var(--color-judge-gray);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.org-myevents-filter-btn:hover {
+  border-color: var(--color-orange);
+  color: var(--color-orange);
+}
+
+.org-myevents-filter-btn.active {
+  background: var(--color-orange);
+  border-color: var(--color-orange);
+  color: white;
+}
+
+.org-myevents-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.org-myevents-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid var(--color-border-color);
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.org-myevents-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--color-card-shadow-hover);
+}
+
+.org-myevents-card-image {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.org-myevents-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.org-myevents-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 800;
+}
+
+.org-myevents-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.org-myevents-card-cat {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.org-myevents-card-ended {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.org-myevents-card-body {
+  padding: 20px;
+}
+
+.org-myevents-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  margin-bottom: 12px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.org-myevents-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-americano);
+  margin-bottom: 6px;
+}
+
+.org-myevents-card-dot {
+  color: var(--color-border-color);
+}
+
+.org-myevents-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-color);
+}
+
+.org-action-btn-danger:hover {
+  background: var(--color-pink-bg);
+  border-color: var(--color-pink);
+  color: var(--color-pink);
+}
+
+.org-myevents-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #F5F5F5;
+  border: 1px solid var(--color-border-color);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  transition: border-color 0.15s;
+}
+
+.org-myevents-search:focus-within {
+  border-color: var(--color-orange);
+  box-shadow: 0 0 0 3px rgba(255,122,0,0.1);
+}
+
+.org-myevents-search input {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-family: var(--font);
+  color: var(--color-charcoal);
+  outline: none;
+}
+
+.org-myevents-search input::placeholder {
+  color: var(--color-americano);
+}
+
+.org-myevents-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.org-myevents-search-clear:hover {
+  background: var(--color-border-color);
 }
 
 /* ======== HISTORY PAGE ======== */

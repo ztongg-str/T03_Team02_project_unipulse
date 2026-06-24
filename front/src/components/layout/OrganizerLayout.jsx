@@ -1,13 +1,25 @@
 import { Outlet, Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { authAPI } from "../../services/api"; 
 
 export default function OrganizerLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleBackToStudent = async () => {
+    try {
+      const res = await authAPI.switchRole();
+      localStorage.setItem("token", res.token);
+      updateUser(res.user);
+      navigate("/events", { replace: true });  // Go to student events page
+    } catch (err) {
+      console.error("Switch failed:", err);
+    }
   };
 
   return (
@@ -73,18 +85,15 @@ export default function OrganizerLayout() {
         </nav>
 
         <div className="org-sidebar-footer">
-          <div className="org-sidebar-user">
-            <div className="org-sidebar-avatar">
-              {user?.fullName?.charAt(0) || user?.username?.charAt(0) || "O"}
-            </div>
-            <div className="org-sidebar-user-info">
-              <div className="org-sidebar-user-name">{user?.fullName || user?.username}</div>
-              <div className="org-sidebar-user-role">Event Organizer</div>
-            </div>
-          </div>
-          <button className="org-sidebar-logout" onClick={handleLogout}>
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M7 16H3a1 1 0 01-1-1V3a1 1 0 011-1h4M12 13l4-4-4-4M16 9H7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <button className="org-sidebar-switch-btn" onClick={handleBackToStudent}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3L2 7l4 4M2 7h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Back to Student
+          </button>
+          <button className="org-sidebar-logout-btn" onClick={handleLogout}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 14H2a1 1 0 01-1-1V3a1 1 0 011-1h4M11 11l3-3-3-3M14 8H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Logout
           </button>
@@ -93,13 +102,6 @@ export default function OrganizerLayout() {
 
       <div className="org-main">
         <header className="org-topbar">
-          <div className="org-topbar-search">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="8" cy="8" r="5" stroke="#85736B" strokeWidth="2"/>
-              <path d="M12 12l4 4" stroke="#85736B" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-            <input type="text" placeholder="Search events, attendees..." />
-          </div>
           <div className="org-topbar-actions">
             <button className="org-topbar-icon-btn">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

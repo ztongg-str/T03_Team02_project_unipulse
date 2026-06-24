@@ -24,5 +24,6 @@ const loginSchema = {
 router.post('/register', validate(registerSchema), authController.register);
 router.post('/login', validate(loginSchema), authController.login);
 router.get('/me', authenticate, authController.getMe);
+router.post('/switch-role', authenticate, authController.switchRole);
 
 export default router;

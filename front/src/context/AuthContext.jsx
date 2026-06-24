@@ -5,8 +5,14 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem("user");
+      return stored && stored !== 'undefined' ? JSON.parse(stored) : null;
+    } catch (e) {
+      console.error("Failed to parse user from localStorage:", e);
+      localStorage.removeItem("user"); // Clear corrupted data
+      return null;
+    }
   });
   const [loading, setLoading] = useState(true);
 
@@ -29,6 +35,10 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    console.log("Current user role:", user?.role);
+  }, [user]);
 
   const login = useCallback(async (email, password) => {
     const res = await authAPI.login({ email, password });

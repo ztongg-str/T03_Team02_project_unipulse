@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { authAPI } from "../../services/api";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -10,6 +11,19 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleCreateEvent = async () => {
+    try {
+      const res = await authAPI.switchRole();
+      localStorage.setItem("token", res.token);
+      setTimeout(() => {
+        navigate("/organizer/dashboard");
+      }, 100);
+    } catch (err) {
+      console.error("switchRole error:", err);
+      navigate("/login");
+    }
   };
 
   const navLinkClass = ({ isActive }) =>
@@ -44,6 +58,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {user ? (
               <>
+                <button onClick={handleCreateEvent} className="btn btn-primary btn-small">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr-1">
+                    <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  Create Event
+                </button>
                 <Link to="/profile" className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full border-2 border-orange bg-orange text-white flex items-center justify-center text-base font-bold overflow-hidden">
                     {user.avatar ? (

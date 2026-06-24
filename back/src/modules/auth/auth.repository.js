@@ -18,10 +18,14 @@ export const findById = async (id) => {
   return rows[0] || null;
 };
 
-export const createUser = async ({ username, email, password, fullName, role }) => {
+export const createUser = async ({ username, email, password, fullName}) => {
   const [result] = await pool.query(
-    'INSERT INTO users (username, email, password, fullName, role) VALUES (?, ?, ?, ?, ?)',
-    [username, email, password, fullName, role]
+    'INSERT INTO users (username, email, password, fullName) VALUES (?, ?, ?, ?)',
+    [username, email, password, fullName]
   );
   return result.insertId;
+};
+
+export const updateRole = async (id, role) => {
+  await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
 };
