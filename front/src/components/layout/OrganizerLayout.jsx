@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { authAPI } from "../../services/api"; 
@@ -5,6 +6,7 @@ import { authAPI } from "../../services/api";
 export default function OrganizerLayout() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -24,7 +26,8 @@ export default function OrganizerLayout() {
 
   return (
     <div className="org-layout">
-      <aside className="org-sidebar">
+      <div className="org-sidebar-overlay" onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 99 }} />
+      <aside className={`org-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="org-sidebar-header">
           <div className="org-sidebar-logo">UniPulse</div>
           <div className="org-sidebar-subtitle">University Events</div>
@@ -103,6 +106,15 @@ export default function OrganizerLayout() {
       <div className="org-main">
         <header className="org-topbar">
           <div className="org-topbar-actions">
+            <button className="org-mobile-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'none' }}>
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#584235" strokeWidth="2" strokeLinecap="round">
+                {sidebarOpen ? (
+                  <><path d="M5 5l12 12M17 5l-12 12" /></>
+                ) : (
+                  <><path d="M4 6h14M4 11h14M4 16h14" /></>
+                )}
+              </svg>
+            </button>
             <button className="org-topbar-icon-btn">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 2a6 6 0 00-6 6v4l-2 3h16l-2-3V8a6 6 0 00-6-6zM8 16a2 2 0 004 0" stroke="#584235" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

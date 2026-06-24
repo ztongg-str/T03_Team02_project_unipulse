@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -59,6 +60,7 @@ const navItems = [
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -67,7 +69,8 @@ export default function AdminLayout() {
 
   return (
     <div className="org-layout">
-      <aside className="org-sidebar">
+      <div className="admin-sidebar-overlay" onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 99 }} />
+      <aside className={`org-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="org-sidebar-header">
           <div className="org-sidebar-logo">UniPulse</div>
           <div className="org-sidebar-subtitle" style={{ color: "#FF7A00", fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}>
@@ -114,6 +117,15 @@ export default function AdminLayout() {
       <div className="org-main">
         <header className="org-topbar">
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button className="admin-mobile-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'none' }}>
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#333" strokeWidth="2" strokeLinecap="round">
+                {sidebarOpen ? (
+                  <><path d="M5 5l12 12M17 5l-12 12" /></>
+                ) : (
+                  <><path d="M4 6h14M4 11h14M4 16h14" /></>
+                )}
+              </svg>
+            </button>
             <span style={{ fontWeight: 700, fontSize: 18, color: "#333" }}>Admin Dashboard</span>
           </div>
           <div className="org-topbar-actions">

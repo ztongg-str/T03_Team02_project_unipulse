@@ -126,7 +126,7 @@ export default function Events() {
     <div>
       {/* Hero Section */}
       <section className="bg-[radial-gradient(102.62%_445.27%_at_100%_0%,#FFDCC0_0%,#FFF8F0_100%)] py-12">
-        <div className="page-container flex gap-12 items-center">
+        <div className="page-container events-hero flex gap-12 items-center">
           <div className="flex-1 max-w-[616px]">
             <span className="inline-flex items-center px-4 py-[2.5px] bg-[var(--wild-watermelon-15)] rounded-full text-wild-watermelon font-bold text-base mb-4">
               &#9679; LIVE ON CAMPUS
@@ -221,7 +221,7 @@ className="">
             <p>Try adjusting your search or filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-6">
+          <div className="events-grid grid grid-cols-3 gap-6">
             {events.map((event, idx) => {
               const catStyle = getCategoryStyle(event.category);
               const isPopular = idx === 3;

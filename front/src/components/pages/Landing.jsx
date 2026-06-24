@@ -24,8 +24,8 @@ export default function Landing() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="max-w-[1280px] mx-auto px-10 pt-24 flex gap-[100px] items-start">
-        <div className="flex-1 pt-[218px]">
+      <section className="landing-hero max-w-[1280px] mx-auto px-10 pt-24 flex gap-[100px] items-start">
+        <div className="landing-hero-text flex-1 pt-[218px]">
           <h1 className="text-5xl font-extrabold leading-[56px] tracking-[-0.96px] text-shark max-w-[493px] mb-4">
             Discover, Participate, Engage
           </h1>
@@ -51,7 +51,7 @@ export default function Landing() {
           </div>
         </div>
 
-        <div className="w-[576px] h-[500px] relative shrink-0">
+        <div className="landing-hero-image w-[576px] h-[500px] relative shrink-0">
           <div className="absolute w-[576px] h-[500px] -left-[12.69px] -top-[14.73px] bg-yellow opacity-20 rounded-3xl rotate-[3deg]" />
           <div className="w-[576px] h-[500px] rounded-3xl bg-gradient-to-br from-orange to-[#ff6b6b] border-4 border-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex items-center justify-center text-white text-2xl font-bold relative">
             Vibrant Campus Life
@@ -64,7 +64,7 @@ export default function Landing() {
         <section className="page-container pt-24">
           <h2 className="section-title">Upcoming Campus Events</h2>
           <div className="section-underline" />
-          <div className="grid grid-cols-3 gap-6 mt-8">
+          <div className="landing-events-grid grid grid-cols-3 gap-6 mt-8">
             {events.map((ev) => (
               <div key={ev.id} className="event-card">
                 <div className="event-card-image">

@@ -59,7 +59,7 @@ export default function StudentHome() {
       </section>
 
       {/* Quick Stats */}
-      <section style={{ display: "flex", gap: 16, marginBottom: 48 }}>
+      <section className="sh-quick-stats" style={{ display: "flex", gap: 16, marginBottom: 48 }}>
         <Link to="/achievements" className="sh-stat-card" style={{ flex: 1 }}>
           <span className="sh-stat-icon" style={{ background: "rgba(255,122,0,0.12)" }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

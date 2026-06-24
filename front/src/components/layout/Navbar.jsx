@@ -7,6 +7,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -37,28 +38,29 @@ export default function Navbar() {
             UniPulse
           </Link>
 
-          {user && (
-            <div className="flex items-center gap-6">
-              <NavLink to="/" className={navLinkClass}>Home</NavLink>
-              <NavLink to="/events" className={navLinkClass}>Events</NavLink>
-              <NavLink to="/friends" className={navLinkClass}>Community</NavLink>
-              <NavLink to="/history" className={navLinkClass}>History</NavLink>
-            </div>
-          )}
-
-          {!user && (
-            <div className="flex items-center gap-8">
-              <NavLink to="/" style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>Home</NavLink>
-              <NavLink to="/events" style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>Events</NavLink>
-              <NavLink to="/friends" style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>Community</NavLink>
-              <NavLink to="/about" style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>About</NavLink>
-            </div>
-          )}
+          <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
+            {user && (
+              <>
+                <NavLink to="/" className={navLinkClass} onClick={() => setMenuOpen(false)}>Home</NavLink>
+                <NavLink to="/events" className={navLinkClass} onClick={() => setMenuOpen(false)}>Events</NavLink>
+                <NavLink to="/friends" className={navLinkClass} onClick={() => setMenuOpen(false)}>Community</NavLink>
+                <NavLink to="/history" className={navLinkClass} onClick={() => setMenuOpen(false)}>History</NavLink>
+              </>
+            )}
+            {!user && (
+              <>
+                <NavLink to="/" onClick={() => setMenuOpen(false)} style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>Home</NavLink>
+                <NavLink to="/events" onClick={() => setMenuOpen(false)} style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>Events</NavLink>
+                <NavLink to="/friends" onClick={() => setMenuOpen(false)} style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>Community</NavLink>
+                <NavLink to="/about" onClick={() => setMenuOpen(false)} style={({ isActive }) => ({ fontWeight: isActive ? 700 : 500, color: isActive ? "var(--orange)" : "var(--judge-gray)" })}>About</NavLink>
+              </>
+            )}
+          </div>
 
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                <button onClick={handleCreateEvent} className="btn btn-primary btn-small">
+                <button onClick={handleCreateEvent} className="btn btn-primary btn-small hidden md:inline-flex">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr-1">
                     <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
@@ -72,9 +74,9 @@ export default function Navbar() {
                       user.fullName?.charAt(0) || user.username?.charAt(0)
                     )}
                   </div>
-                  <span className="text-lg font-medium text-judge-gray">{user.fullName || user.username}</span>
+                  <span className="navbar-user-name">{user.fullName || user.username}</span>
                 </Link>
-                <button onClick={() => setShowLogoutModal(true)} className="btn btn-outlined btn-small">
+                <button onClick={() => setShowLogoutModal(true)} className="btn btn-outlined btn-small hidden md:inline-flex">
                   Logout
                 </button>
               </>
@@ -84,6 +86,15 @@ export default function Navbar() {
                 <Link to="/register" className="btn btn-primary btn-small">Register</Link>
               </>
             )}
+            <button className="navbar-hamburger" onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2" strokeLinecap="round">
+                {menuOpen ? (
+                  <><path d="M6 6l12 12M18 6l-12 12" /></>
+                ) : (
+                  <><path d="M4 6h16M4 12h16M4 18h16" /></>
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </nav>
