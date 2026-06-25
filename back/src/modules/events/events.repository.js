@@ -18,8 +18,8 @@ export const findAll = async ({ page = 1, limit = 20, category, status, search }
     const s = `%${search}%`;
     params.push(s, s);
   }
-  if (!user || user.role === 'student') {
-    where += ' AND e.status = ?';
+  if (!user || user.role !== 'admin') {
+    where += ' AND e.status = ? AND e.date >= NOW()';
     params.push('approved');
   }
 
@@ -52,7 +52,8 @@ export const findUpcoming = async ({ page = 1, limit = 20 } = {}) => {
 export const findByOrganizer = async (organizerId, { page = 1, limit = 20 } = {}) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT e.*, u.fullName as organizerName
+    `SELECT e.*, u.fullName as organizerName,
+            (SELECT COUNT(*) FROM registrations WHERE eventId = e.id) as registeredCount
      FROM events e JOIN users u ON e.organizerId = u.id
      WHERE e.organizerId = ? ORDER BY e.createdAt DESC LIMIT ? OFFSET ?`,
     [organizerId, Number(limit), Number(offset)]

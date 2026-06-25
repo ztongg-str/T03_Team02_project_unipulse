@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { adminEventsAPI } from "../../services/api";
 
 const STATUS_COLORS = { pending: "#FF7A00", approved: "#22c55e", rejected: "#ef4444" };
@@ -186,6 +187,9 @@ export default function AdminEvents() {
                               Re-approve
                             </button>
                           )}
+                          <Link to={`/admin/events/edit/${ev.id}`} style={{ padding: "6px 10px", border: "1.5px solid #E0E0E0", color: "#8A7A72", borderRadius: 8, background: "none", cursor: "pointer", fontSize: 12, textDecoration: "none", display: "inline-flex", alignItems: "center" }} title="Edit">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2L7 11H5V9l6.5-6.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                          </Link>
                           <button onClick={() => setDeleteTarget(ev)} title="Delete" style={{ padding: "6px 10px", border: "1.5px solid #E0E0E0", color: "#8A7A72", borderRadius: 8, background: "none", cursor: "pointer", fontSize: 12 }}>
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M5 3V2h4v1M6 6v4M8 6v4M3 3l.7 8.3A1 1 0 004.7 12h4.6a1 1 0 001-.7L11 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
                           </button>

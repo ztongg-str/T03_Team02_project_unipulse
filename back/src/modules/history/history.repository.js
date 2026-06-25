@@ -57,6 +57,42 @@ export const create = async (data) => {
   return result.insertId;
 };
 
+export const expireUserUpcomingEvents = async (userId) => {
+  const [expiredUpcoming] = await pool.query(
+    `SELECT ue.id, ue.userId, ue.eventId, ue.registrationId
+     FROM upcoming_events ue
+     JOIN events e ON ue.eventId = e.id
+     WHERE ue.userId = ? AND e.date <= NOW()`,
+    [userId]
+  );
+
+  if (expiredUpcoming.length === 0) return [];
+
+  const movedIds = [];
+  for (const row of expiredUpcoming) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      await conn.query(
+        `INSERT IGNORE INTO past_event_history (userId, eventId, registrationId, attended, xpEarned, status)
+         VALUES (?, ?, ?, FALSE, 0, 'missed')`,
+        [row.userId, row.eventId, row.registrationId]
+      );
+      await conn.query(
+        'DELETE FROM upcoming_events WHERE id = ?',
+        [row.id]
+      );
+      await conn.commit();
+      movedIds.push(row.id);
+    } catch {
+      await conn.rollback();
+    } finally {
+      conn.release();
+    }
+  }
+  return movedIds;
+};
+
 export const removeUpcoming = async (userId, eventId) => {
   await pool.query(
     'DELETE FROM upcoming_events WHERE userId = ? AND eventId = ?',

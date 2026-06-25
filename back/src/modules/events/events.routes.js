@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as eventsController from './events.controller.js';
-import { authenticate } from '../../middlewares/authMiddleware.js';
+import { authenticate, optionalAuth } from '../../middlewares/authMiddleware.js';
 import { authorize } from '../../middlewares/roleMiddleware.js';
 import { validate, required, minLength } from '../../middlewares/validationMiddleware.js';
 
@@ -17,7 +17,7 @@ const createEventSchema = {
   },
 };
 
-router.get('/', eventsController.getAllEvents);
+router.get('/', optionalAuth, eventsController.getAllEvents);
 router.get('/upcoming', authenticate, eventsController.getUpcomingEvents);
 router.get('/my', authenticate, authorize('organizer', 'student'), eventsController.getMyEvents);
 router.get('/:id', eventsController.getEventById);

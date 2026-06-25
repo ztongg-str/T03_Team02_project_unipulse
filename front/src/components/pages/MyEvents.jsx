@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { eventsAPI } from "../../services/api";
-import { useAuth } from "../../context/AuthContext";
 
 const statusFilters = [
   { label: "All", value: "" },
@@ -24,7 +23,6 @@ const categoryColors = {
 };
 
 export default function MyEvents() {
-  const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
@@ -42,11 +40,8 @@ export default function MyEvents() {
 
   const fetchMyEvents = async () => {
     try {
-      const res = await eventsAPI.getAll();
-      const allEvents = res.data?.events || [];
-      const myEvents = allEvents.filter(
-        (e) => e.organizerId === user?.id || e.userId === user?.id
-      );
+      const res = await eventsAPI.getMy();
+      const myEvents = res.data || [];
       setEvents(myEvents);
     } catch {
       setEvents([]);
@@ -75,7 +70,7 @@ export default function MyEvents() {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
     setDeleting(id);
     try {
-      await eventsAPI.delete?.(id);
+      await eventsAPI.delete(id);
       setEvents((prev) => prev.filter((e) => e.id !== id && e._id !== id));
     } catch {
       alert("Failed to delete event.");

@@ -64,7 +64,8 @@ export default function Events() {
         user ? streaksAPI.getMy() : Promise.resolve(null),
       ]);
       if (eventsRes.status === "fulfilled") {
-        setEvents(eventsRes.value.data?.events || []);
+        const allEvents = eventsRes.value.data?.events || [];
+        setEvents(allEvents.filter((e) => new Date(e.date) >= new Date()));
       } else {
         setEvents([]);
       }

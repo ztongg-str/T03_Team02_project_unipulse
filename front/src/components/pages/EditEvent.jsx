@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { eventsAPI } from "../../services/api";
 
 const categories = [
@@ -10,6 +10,9 @@ const categories = [
 export default function EditEvent() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+  const backPath = isAdmin ? "/admin/events" : "/organizer/my-events";
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -85,7 +88,7 @@ export default function EditEvent() {
       };
       if (!payload.image) delete payload.image;
       await eventsAPI.update(id, payload);
-      navigate("/organizer/my-events");
+      navigate(backPath);
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -257,7 +260,7 @@ export default function EditEvent() {
             </button>
             <button
               type="button"
-              onClick={() => navigate("/organizer/my-events")}
+              onClick={() => navigate(backPath)}
               className="btn btn-outlined"
             >
               Cancel

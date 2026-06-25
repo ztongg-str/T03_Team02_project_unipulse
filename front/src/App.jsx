@@ -87,6 +87,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/events" element={<AdminEvents />} />
+            <Route path="/admin/events/edit/:id" element={<EditEvent />} />
             <Route path="/admin/verification" element={<AdminVerification />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>

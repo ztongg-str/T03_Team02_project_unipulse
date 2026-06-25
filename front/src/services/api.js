@@ -48,9 +48,11 @@ export const uploadAPI = {
 export const eventsAPI = {
   getAll: (params) => api.get("/events", { params }).then((r) => r.data),
   getUpcoming: (params) => api.get("/events/upcoming", { params }).then((r) => r.data),
+  getMy: (params) => api.get("/events/my", { params }).then((r) => r.data),
   getById: (id) => api.get(`/events/${id}`).then((r) => r.data),
   create: (data) => api.post("/events", data).then((r) => r.data),
   update: (id, data) => api.put(`/events/${id}`, data).then((r) => r.data),
+  delete: (id) => api.delete(`/events/${id}`).then((r) => r.data),
 };
 
 export const registrationsAPI = {

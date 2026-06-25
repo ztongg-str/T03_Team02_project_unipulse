@@ -18,7 +18,7 @@ export default function History() {
         historyAPI.getUpcoming(),
         historyAPI.getPast(),
       ]);
-      setUpcoming(upRes.data || []);
+      setUpcoming((upRes.data || []).filter((e) => new Date(e.date) > new Date()));
       setPast(pastRes.data || []);
     } catch {
     } finally {
@@ -242,7 +242,8 @@ export default function History() {
           <div className="history-past-list">
             {filteredPast.map((ev) => {
               const isAttended = ev.attended || ev.status === "attended";
-              const isMissed = ev.status === "missed" || (!isAttended && ev.status !== "refunded");
+              const isExpired = ev.status === "expired";
+              const isMissed = ev.status === "missed" || (!isAttended && ev.status !== "refunded" && !isExpired);
               const isRefunded = ev.status === "refunded";
 
               return (
@@ -264,9 +265,10 @@ export default function History() {
                     <h4 className="hpl-card-title">{ev.title}</h4>
                     <p className="hpl-card-sub">
                       {isAttended && `Attended`}
+                      {isExpired && `Expired`}
                       {isMissed && `Not Attended`}
                       {isRefunded && `Not Attended`}
-                      {ev.description ? ` \u2022 ${ev.description}` : ""}
+                      {ev.description && !isExpired ? ` \u2022 ${ev.description}` : ""}
                     </p>
                   </div>
 
@@ -278,6 +280,14 @@ export default function History() {
                             <path d="M1.5 5.5L7 11L12.5 5.5" stroke="#1A8038" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                           Attended
+                        </span>
+                      )}
+                      {isExpired && (
+                        <span className="hpl-badge missed">
+                          <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+                            <path d="M1.5 5.5L7 11L12.5 5.5" stroke="#8A7A72" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          Expired
                         </span>
                       )}
                       {isMissed && (
@@ -299,7 +309,7 @@ export default function History() {
                       <div className="hpl-card-xp">
                         {isAttended && ev.xpEarned > 0
                           ? `Earned ${ev.xpEarned} XP`
-                          : (isMissed || isRefunded) && "No XP Awarded"}
+                          : (isMissed || isRefunded || isExpired) && "No XP Awarded"}
                       </div>
                     </div>
                     <Link to={`/events/${ev.eventId || ev.id}`} className="hpl-card-arrow">

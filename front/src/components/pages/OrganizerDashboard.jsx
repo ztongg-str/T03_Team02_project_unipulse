@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { eventsAPI, registrationsAPI } from "../../services/api";
+import { eventsAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 export default function OrganizerDashboard() {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
-  const [registrationsCount, setRegistrationsCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,23 +14,8 @@ export default function OrganizerDashboard() {
 
   const fetchData = async () => {
     try {
-      const [eventsRes, regRes] = await Promise.allSettled([
-        eventsAPI.getAll(),
-        registrationsAPI.getMy(),
-      ]);
-      if (eventsRes.status === "fulfilled") {
-        const allEvents = eventsRes.value.data?.events || [];
-        const myEvents = user ? allEvents.filter(e => e.organizerId === user.id || e.userId === user.id) : allEvents;
-        if (myEvents.length === 0) {
-          setEvents(allEvents.slice(0, 10));
-        } else {
-          setEvents(myEvents);
-        }
-      }
-      if (regRes.status === "fulfilled") {
-        const regs = regRes.value.data || [];
-        setRegistrationsCount(regs.length);
-      }
+      const res = await eventsAPI.getMy();
+      setEvents(res.data || []);
     } catch {
       setEvents([]);
     } finally {
@@ -42,6 +26,7 @@ export default function OrganizerDashboard() {
   const totalEvents = events.length;
   const pendingEvents = events.filter(e => e.status === "pending").length;
   const approvedEvents = events.filter(e => e.status === "approved" || e.status === "active").length;
+  const registrationsCount = events.reduce((sum, e) => sum + (e.registeredCount || 0), 0);
 
   const stats = [
     { label: "Total Events", value: totalEvents, icon: "calendar", color: "#FF7A00", bg: "rgba(255,122,0,0.1)" },
@@ -56,7 +41,15 @@ export default function OrganizerDashboard() {
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
-  const getStatusBadge = (status) => {
+  const isExpired = (dateStr) => {
+    if (!dateStr) return false;
+    return new Date(dateStr) < new Date();
+  };
+
+  const getStatusBadge = (status, dateStr) => {
+    if (isExpired(dateStr)) {
+      return <span className="badge badge-danger">Expired</span>;
+    }
     const map = {
       pending: { label: "Pending", className: "badge-yellow" },
       approved: { label: "Approved", className: "badge-green" },
@@ -152,7 +145,7 @@ export default function OrganizerDashboard() {
                         <div className="org-table-event-name">{ev.title}</div>
                       </td>
                       <td className="org-table-date">{formatDate(ev.date)}</td>
-                      <td>{getStatusBadge(ev.status)}</td>
+                      <td>{getStatusBadge(ev.status, ev.date)}</td>
                       <td>
                         <div className="org-table-actions">
                           <Link to={`/events/${ev.id}`} className="org-action-btn" title="View">
@@ -161,11 +154,11 @@ export default function OrganizerDashboard() {
                               <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="2"/>
                             </svg>
                           </Link>
-                          <button className="org-action-btn" title="Edit">
+                          <Link to={`/organizer/edit-event/${ev.id}`} className="org-action-btn" title="Edit">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                               <path d="M11.5 2.5l2 2L7 11H5V9l6.5-6.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                          </button>
+                          </Link>
                         </div>
                       </td>
                     </tr>
