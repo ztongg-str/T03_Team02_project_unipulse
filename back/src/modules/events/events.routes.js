@@ -17,10 +17,10 @@ const createEventSchema = {
   },
 };
 
-router.get('/', authenticate, eventsController.getAllEvents);
+router.get('/', eventsController.getAllEvents);
 router.get('/upcoming', authenticate, eventsController.getUpcomingEvents);
 router.get('/my', authenticate, authorize('organizer', 'student'), eventsController.getMyEvents);
-router.get('/:id', authenticate, eventsController.getEventById);
+router.get('/:id', eventsController.getEventById);
 router.post('/', authenticate, authorize('organizer', 'student'), validate(createEventSchema), eventsController.createEvent);
 router.put('/:id', authenticate, authorize('organizer', 'admin'), eventsController.updateEvent);
 router.delete('/:id', authenticate, authorize('organizer', 'admin'), eventsController.deleteEvent);

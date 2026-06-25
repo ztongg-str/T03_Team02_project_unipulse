@@ -18,7 +18,7 @@ export const findAll = async ({ page = 1, limit = 20, category, status, search }
     const s = `%${search}%`;
     params.push(s, s);
   }
-  if (user.role === 'student') {
+  if (!user || user.role === 'student') {
     where += ' AND e.status = ?';
     params.push('approved');
   }

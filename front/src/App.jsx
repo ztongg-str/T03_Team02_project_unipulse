@@ -15,6 +15,7 @@ import FriendProfile from "./components/pages/FriendProfile";
 import Achievements from "./components/pages/Achievements";
 import Streaks from "./components/pages/Streaks";
 import ActivityLog from "./components/pages/ActivityLog";
+import StudentHome from "./components/pages/StudentHome";
 import About from "./components/pages/About";
 import History from "./components/pages/History";
 import OrganizerDashboard from "./components/pages/OrganizerDashboard";
@@ -44,18 +45,21 @@ function HomeRedirect() {
     } else if (user.role === "organizer") {
       authAPI.switchRole()
         .then((res) => {
-          localStorage.setItem("token", res.token);
-          updateUser(res.user);
+          localStorage.setItem("token", res.data.token);
+          updateUser(res.data.user);
           navigate("/events", { replace: true });
         })
         .catch(() => navigate("/events", { replace: true }));
+    } else if (user.role === "organizer") {
+      // already handled above
     } else {
-      navigate("/events", { replace: true });
+      // student — show StudentHome below, no redirect
     }
   }, [user, loading, navigate, updateUser]);
 
   if (loading) return <div className="loading">Loading...</div>;
   if (!user) return <Landing />;
+  if (user.role === "student") return <StudentHome />;
   return <div className="loading">Redirecting...</div>;
 }
 

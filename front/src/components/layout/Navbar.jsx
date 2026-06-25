@@ -17,13 +17,13 @@ export default function Navbar() {
   const handleCreateEvent = async () => {
     try {
       const res = await authAPI.switchRole();
-      localStorage.setItem("token", res.token);
+      localStorage.setItem("token", res.data.token);
       setTimeout(() => {
         navigate("/organizer/dashboard");
       }, 100);
     } catch (err) {
       console.error("switchRole error:", err);
-      navigate("/login");
+      navigate("/login", { state: { redirectTo: "/organizer/dashboard" } });
     }
   };
 

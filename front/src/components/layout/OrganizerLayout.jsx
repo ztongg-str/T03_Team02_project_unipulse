@@ -16,11 +16,12 @@ export default function OrganizerLayout() {
   const handleBackToStudent = async () => {
     try {
       const res = await authAPI.switchRole();
-      localStorage.setItem("token", res.token);
-      updateUser(res.user);
+      localStorage.setItem("token", res.data.token);
+      updateUser(res.data.user);
       navigate("/events", { replace: true });  // Go to student events page
     } catch (err) {
       console.error("Switch failed:", err);
+      navigate("/login", { state: { redirectTo: "/events" } });
     }
   };
 
@@ -57,12 +58,7 @@ export default function OrganizerLayout() {
             </svg>
             Create Event
           </NavLink>
-          <NavLink to="/organizer/reports" className={({ isActive }) => isActive ? "org-nav-item active" : "org-nav-item"}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M3 17V5a2 2 0 012-2h10a2 2 0 012 2v12l-4-2-4 2-4-2-4 2z" stroke="currentColor" strokeWidth="2"/>
-            </svg>
-            Reports
-          </NavLink>
+
           <NavLink to="/profile" className={({ isActive }) => isActive ? "org-nav-item active" : "org-nav-item"}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
@@ -70,14 +66,7 @@ export default function OrganizerLayout() {
             </svg>
             Profile
           </NavLink>
-          <NavLink to="/friends" className={({ isActive }) => isActive ? "org-nav-item active" : "org-nav-item"}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="7" cy="6" r="3" stroke="currentColor" strokeWidth="2"/>
-              <circle cx="13" cy="6" r="3" stroke="currentColor" strokeWidth="2"/>
-              <path d="M2 17c0-3 2.5-5 5-5s5 2 5 5M10 17c0-3 2.5-5 5-5s5 2 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-            Community
-          </NavLink>
+
           <NavLink to="/organizer/settings" className={({ isActive }) => isActive ? "org-nav-item active" : "org-nav-item"}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
@@ -115,11 +104,7 @@ export default function OrganizerLayout() {
                 )}
               </svg>
             </button>
-            <button className="org-topbar-icon-btn">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2a6 6 0 00-6 6v4l-2 3h16l-2-3V8a6 6 0 00-6-6zM8 16a2 2 0 004 0" stroke="#584235" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
+
             <div className="org-topbar-user">
               <div className="org-topbar-avatar">
                 {user?.fullName?.charAt(0) || user?.username?.charAt(0) || "O"}

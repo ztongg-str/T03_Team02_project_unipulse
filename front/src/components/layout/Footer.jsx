@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className={`${bg} border-t border-[rgba(216,194,184,0.3)] py-8`}>
       <div className="footer-inner">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-6 md:gap-0 min-h-16">
-          <div className="text-center md:text-left">
+          <div className=" flex flex-col text-center min-w-full">
             <div className="text-2xl font-extrabold text-orange mb-1">Unipulse</div>
             <div className="text-sm md:text-base text-kabul">&copy; 2024 Unipulse University Community. All rights reserved.</div>
           </div>

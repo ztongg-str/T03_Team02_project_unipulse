@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS past_event_history (
   xpEarned INT DEFAULT 0,
   certificateIssued BOOLEAN DEFAULT FALSE,
   refundProcessed BOOLEAN DEFAULT FALSE,
-  status ENUM('attended', 'missed', 'refunded') NOT NULL DEFAULT 'missed',
+  status ENUM('attended', 'missed') NOT NULL DEFAULT 'missed',
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,

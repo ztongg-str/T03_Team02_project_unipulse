@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+// import { useAuth } from "../../context/AuthContext";
 import { eventsAPI } from "../../services/api";
 
 export default function Landing() {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function Landing() {
     <div>
       {/* Hero Section */}
       <section className="landing-hero max-w-[1280px] mx-auto px-10 pt-24 flex gap-[100px] items-start">
-        <div className="landing-hero-text flex-1 pt-[218px]">
+        <div className="landing-hero-text flex-1 pt-[24px]">
           <h1 className="text-5xl font-extrabold leading-[56px] tracking-[-0.96px] text-shark max-w-[493px] mb-4">
             Discover, Participate, Engage
           </h1>
@@ -34,17 +34,10 @@ export default function Landing() {
             and rewards that turn participation into a vibrant social lifestyle.
           </p>
           <div className="flex gap-4 items-center">
-            {user ? (
-              <Link to="/events" className="btn btn-primary btn-lg">
-                Explore Events
-                <span className="text-xl">{'\u2192'}</span>
-              </Link>
-            ) : (
-              <Link to="/register" className="btn btn-primary btn-lg">
-                Get Started
-                <span className="text-xl">{'\u2192'}</span>
-              </Link>
-            )}
+            <Link to="/login" className="btn btn-primary btn-lg">
+              Get Start
+              <span className="text-xl">{'\u2192'}</span>
+            </Link>
             <Link to="/events" className="btn btn-secondary btn-lg">
               Browse Events
             </Link>
@@ -62,7 +55,7 @@ export default function Landing() {
       {/* Events Section */}
       {events.length > 0 && (
         <section className="page-container pt-24">
-          <h2 className="section-title">Upcoming Campus Events</h2>
+          <h2 className="section-title pt-24">Upcoming Campus Events</h2>
           <div className="section-underline" />
           <div className="landing-events-grid grid grid-cols-3 gap-6 mt-8">
             {events.map((ev) => (
@@ -78,20 +71,14 @@ export default function Landing() {
                       month: "short", day: "numeric", year: "numeric"
                     })}
                   </p>
-                  {user ? (
-                    <Link to={`/events/${ev.id}`} className="btn btn-primary btn-small">
-                      View Details
-                    </Link>
-                  ) : (
-                    <Link to="/login" className="btn btn-primary btn-small">
-                      Log in to Join
-                    </Link>
-                  )}
+                  <Link to={`/events/${ev.id}`} className="btn btn-primary btn-small">
+                    View Details
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
-          <div className="text-center mt-8">
+          <div className="text-center mt-12">
             <Link to="/events" className="btn btn-secondary">
               View All Events
             </Link>
@@ -166,15 +153,9 @@ export default function Landing() {
             Ready to pulse with your campus?
           </h2>
 
-          {user ? (
-            <Link to="/events" className="btn btn-primary btn-lg relative z-10">
-              Explore Events
-            </Link>
-          ) : (
-            <Link to="/register" className="btn btn-primary btn-lg relative z-10">
-              Get Started
-            </Link>
-          )}
+          <Link to="/events" className="btn btn-primary btn-lg relative z-10">
+            Explore Events
+          </Link>
 
           <div className="mt-4 relative z-10">
             <Link to="/events" className="text-white underline font-medium text-base opacity-80 hover:opacity-100 transition-opacity">
