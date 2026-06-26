@@ -1,4 +1,4 @@
-Click Code to preview
+Click Code to copy it
 
 1. Create .env file inside (back folder)
     paste this into it:
