@@ -61,7 +61,7 @@ export default function Navbar() {
             {user ? (
               <>
                 <button onClick={handleCreateEvent} className="btn btn-primary btn-small hidden md:inline-flex">
-                  Create Event
+                  Be organizer
                 </button>
                 <Link to="/profile" className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full border-2 border-orange bg-orange text-white flex items-center justify-center text-base font-bold overflow-hidden">
