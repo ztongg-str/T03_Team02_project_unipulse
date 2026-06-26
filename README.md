@@ -1,3 +1,5 @@
+Click Code to preview
+
 1. Create .env file inside (back folder)
     paste this into it:
         DB_HOST=mysql-unipulse-ztongdb-123.i.aivencloud.com
