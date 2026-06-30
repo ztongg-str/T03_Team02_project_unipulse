@@ -1274,11 +1274,17 @@ input, textarea, select { font-family: inherit; outline: none; }
 .friends-pending-card {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
   padding: 12px 16px;
   background: var(--color-orange-bg);
   border-radius: 12px;
-  justify-content: space-between;
+}
+
+.friends-pending-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .friends-pending-avatar {

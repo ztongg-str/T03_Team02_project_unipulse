@@ -228,17 +228,21 @@ export default function Friends() {
               </div>
             ) : (
               <div className="friends-pending-section">
-                {pendingRequests.map((req) => (
+                  {pendingRequests.map((req) => (
                   <div key={req.id} className="friends-pending-card">
-                    <div className="friends-pending-avatar overflow-hidden">
-                      {req.avatar ? (
-                        <img src={`http://localhost:4000${req.avatar}`} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        req.fullName?.charAt(0) || req.username?.charAt(0)
-                      )}
+                    <div className="friends-pending-info">
+                      <div className="friends-pending-avatar overflow-hidden">
+                        {req.avatar ? (
+                          <img src={`http://localhost:4000${req.avatar}`} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          req.fullName?.charAt(0) || req.username?.charAt(0)
+                        )}
+                      </div>
+                      <div>
+                        <div className="friend-card-name">{req.fullName}</div>
+                        <div className="friend-card-username">@{req.username}</div>
+                      </div>
                     </div>
-                    <div className="friend-card-name">{req.fullName}</div>
-                    <div className="friend-card-username">@{req.username}</div>
                     <div className="friends-pending-actions">
                       <button className="friends-pending-accept" onClick={() => handleAccept(req.id)}>
                         Accept
