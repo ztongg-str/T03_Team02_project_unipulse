@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as eventsController from './events.controller.js';
 import { authenticate, optionalAuth } from '../../middlewares/authMiddleware.js';
-import { authorize } from '../../middlewares/roleMiddleware.js';
+import { authorize, requirePermission } from '../../middlewares/roleMiddleware.js';
 import { validate, required, minLength } from '../../middlewares/validationMiddleware.js';
 
 const router = Router();
@@ -21,13 +21,29 @@ router.get('/', optionalAuth, eventsController.getAllEvents);
 router.get('/upcoming', authenticate, eventsController.getUpcomingEvents);
 router.get('/my', authenticate, authorize('organizer', 'student'), eventsController.getMyEvents);
 router.get('/:id', eventsController.getEventById);
-router.post('/', authenticate, authorize('organizer', 'student'), validate(createEventSchema), eventsController.createEvent);
-router.put('/:id', authenticate, authorize('organizer', 'admin'), eventsController.updateEvent);
-router.delete('/:id', authenticate, authorize('organizer', 'admin'), eventsController.deleteEvent);
 
-// Event Verification — admin only. Organizers can no longer self-approve;
-// every new event sits in 'pending' until an admin reviews it.
-router.patch('/:id/approve', authenticate, authorize('admin'), eventsController.approveEvent);
-router.patch('/:id/reject', authenticate, authorize('admin'), eventsController.rejectEvent);
+router.post(
+  '/',
+  authenticate,
+  authorize('organizer', 'student'),
+  validate(createEventSchema),
+  eventsController.createEvent
+);
+
+// Edit/delete — organizer (own events) + admin roles with manageEvents permission
+router.put('/:id',    authenticate, authorize('organizer', 'superadmin', 'coordinator'), eventsController.updateEvent);
+router.delete('/:id', authenticate, authorize('organizer', 'superadmin', 'coordinator'), eventsController.deleteEvent);
+
+// Event verification — superadmin + coordinator
+router.patch('/:id/approve', authenticate, requirePermission('verifyEvents'), eventsController.approveEvent);
+router.patch('/:id/reject',  authenticate, requirePermission('verifyEvents'), eventsController.rejectEvent);
+
+// This is for drafting when user wanna save what they have done half way
+router.post(
+  '/draft',
+  authenticate,
+  authorize('organizer', 'student'),
+  eventsController.saveDraft
+);
 
 export default router;

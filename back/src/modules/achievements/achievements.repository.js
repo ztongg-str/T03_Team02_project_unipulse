@@ -93,7 +93,7 @@ export const countAttended = async (userId) => {
 
 export const countFriends = async (userId) => {
   const [rows] = await pool.query(
-    'SELECT COUNT(*) as count FROM friends WHERE userId = ? OR friendId = ?',
+    'SELECT COUNT(*) as count FROM friends WHERE (userId = ? OR friendId = ?) AND status = \'accepted\'',
     [userId, userId]
   );
   return rows[0].count;

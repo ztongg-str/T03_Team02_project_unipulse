@@ -2,7 +2,8 @@ import * as usersRepository from './users.repository.js';
 import { checkAndGrant } from '../achievements/achievements.service.js';
 import { hashPassword } from '../../utils/password.js';
 
-const VALID_ROLES = ['student', 'organizer', 'admin'];
+const VALID_ROLES = ['student', 'organizer', 'superadmin', 'developer', 'coordinator'];
+const ADMIN_ROLES = ['superadmin', 'developer', 'coordinator'];
 const VALID_STATUSES = ['active', 'suspended'];
 
 export const getProfile = async (userId) => {
@@ -96,12 +97,12 @@ export const updateUserRole = async (id, role, actingUser) => {
     err.statusCode = 404;
     throw err;
   }
-  if (user.role === 'admin' && role !== 'admin' && Number(actingUser.id) === Number(id)) {
+  if (ADMIN_ROLES.includes(user.role) && !ADMIN_ROLES.includes(role) && Number(actingUser.id) === Number(id)) {
     const err = new Error('You cannot remove your own admin role');
     err.statusCode = 400;
     throw err;
   }
-  if (user.role === 'admin' && role !== 'admin') {
+  if (ADMIN_ROLES.includes(user.role) && !ADMIN_ROLES.includes(role)) {
     const adminCount = await usersRepository.countAdmins();
     if (adminCount <= 1) {
       const err = new Error('Cannot demote the last remaining admin account');
@@ -146,7 +147,7 @@ export const deleteUser = async (id, actingUser) => {
     err.statusCode = 400;
     throw err;
   }
-  if (user.role === 'admin') {
+  if (ADMIN_ROLES.includes(user.role)) {
     const adminCount = await usersRepository.countAdmins();
     if (adminCount <= 1) {
       const err = new Error('Cannot delete the last remaining admin account');

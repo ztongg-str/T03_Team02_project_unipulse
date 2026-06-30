@@ -18,7 +18,8 @@ export const findAll = async ({ page = 1, limit = 20, category, status, search }
     const s = `%${search}%`;
     params.push(s, s);
   }
-  if (!user || user.role !== 'admin') {
+  const ADMIN_ROLES = ['superadmin', 'developer', 'coordinator'];
+  if (!user || !ADMIN_ROLES.includes(user.role)) {
     where += ' AND e.status = ? AND e.date >= NOW()';
     params.push('approved');
   }
@@ -71,11 +72,10 @@ export const findById = async (id) => {
 };
 
 export const create = async (data) => {
-  const status = data.status || 'pending';
   const [result] = await pool.query(
     `INSERT INTO events (title, description, date, location, category, maxParticipants, image, organizerId, status)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [data.title, data.description, data.date, data.location, data.category, data.maxParticipants, data.image || null, data.organizerId, status]
+    [data.title, data.description, data.date, data.location, data.category, data.maxParticipants, data.image || null, data.organizerId, data.status || 'pending']
   );
   return result.insertId;
 };

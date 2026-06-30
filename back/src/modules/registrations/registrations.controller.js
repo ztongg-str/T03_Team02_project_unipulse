@@ -9,25 +9,6 @@ export const registerForEvent = async (req, res, next) => {
     return error(res, err.message, err.statusCode || 400);
   }
 };
-
-export const cancelRegistration = async (req, res, next) => {
-  try {
-    await registrationsService.cancelRegistration(req.params.id, req.user);
-    return success(res, null, 'Registration cancelled successfully');
-  } catch (err) {
-    return error(res, err.message, err.statusCode || 400);
-  }
-};
-
-export const cancelRegistrationByEvent = async (req, res, next) => {
-  try {
-    await registrationsService.cancelRegistrationByEvent(req.params.eventId, req.user);
-    return success(res, null, 'Registration cancelled successfully');
-  } catch (err) {
-    return error(res, err.message, err.statusCode || 400);
-  }
-};
-
 export const checkRegistration = async (req, res, next) => {
   try {
     const result = await registrationsService.checkRegistration(req.params.eventId, req.user.id);

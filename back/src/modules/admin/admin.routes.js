@@ -1,14 +1,16 @@
 import { Router } from 'express';
 import * as adminController from './admin.controller.js';
 import { authenticate } from '../../middlewares/authMiddleware.js';
-import { authorize } from '../../middlewares/roleMiddleware.js';
+import { requirePermission } from '../../middlewares/roleMiddleware.js';
 
 const router = Router();
 
-router.use(authenticate, authorize('admin'));
+// All admin routes require authentication
+router.use(authenticate);
 
-router.get('/dashboard', adminController.getDashboard);
-router.get('/logs', adminController.getAdminLogs);
-router.get('/system-health', adminController.getSystemHealth);
+// Dashboard & logs — all three admin roles
+router.get('/dashboard',     requirePermission('dashboard'),    adminController.getDashboard);
+router.get('/logs',          requirePermission('logs'),         adminController.getAdminLogs);
+router.get('/system-health', requirePermission('systemHealth'), adminController.getSystemHealth);
 
 export default router;

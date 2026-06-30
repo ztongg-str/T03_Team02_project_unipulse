@@ -33,15 +33,6 @@ export const create = async (userId, eventId) => {
   );
   return result.insertId;
 };
-
-export const remove = async (id) => {
-  await pool.query('DELETE FROM registrations WHERE id = ?', [id]);
-};
-
-export const removeByUserAndEvent = async (userId, eventId) => {
-  await pool.query('DELETE FROM registrations WHERE userId = ? AND eventId = ?', [userId, eventId]);
-};
-
 export const findByUser = async (userId) => {
   const [rows] = await pool.query(
     `SELECT r.*, e.title as eventTitle, e.date, e.location, e.category

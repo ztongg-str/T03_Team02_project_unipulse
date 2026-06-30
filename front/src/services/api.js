@@ -30,6 +30,9 @@ export const authAPI = {
   login: (data) => api.post("/auth/login", data).then((r) => r.data),
   me: () => api.get("/auth/me").then((r) => r.data),
   switchRole: () => api.post("/auth/switch-role").then((r) => r.data),
+  forgotPassword: (email) => api.post("/auth/otp/forgot-password", { email }).then((r) => r.data),
+  resetPassword: (email, otp, password) => api.post("/auth/otp/reset-password", { email, otp, password }).then((r) => r.data),
+  resendOtp: (email) => api.post("/auth/otp/resend", { email }).then((r) => r.data),
 };
 
 export const usersAPI = {
@@ -59,18 +62,22 @@ export const eventsAPI = {
 
 export const registrationsAPI = {
   register: (eventId) => api.post("/registrations", { eventId }).then((r) => r.data),
-  cancel: (id) => api.delete(`/registrations/${id}`).then((r) => r.data),
-  cancelByEvent: (eventId) => api.delete(`/registrations/event/${eventId}`).then((r) => r.data),
   check: (eventId) => api.get(`/registrations/check/${eventId}`).then((r) => r.data),
   getMy: () => api.get("/registrations/my").then((r) => r.data),
 };
 
 export const friendsAPI = {
   getMy: () => api.get("/friends").then((r) => r.data),
+  discover: () => api.get("/friends/discover").then((r) => r.data),
   search: (q) => api.get("/friends/search", { params: { q } }).then((r) => r.data),
   add: (userId) => api.post(`/friends/add/${userId}`).then((r) => r.data),
   remove: (id) => api.delete(`/friends/${id}`).then((r) => r.data),
   getProfile: (userId) => api.get(`/friends/profile/${userId}`).then((r) => r.data),
+  getPending: () => api.get("/friends/requests").then((r) => r.data),
+  getSent: () => api.get("/friends/requests/sent").then((r) => r.data),
+  acceptRequest: (id) => api.post(`/friends/requests/${id}/accept`).then((r) => r.data),
+  declineRequest: (id) => api.post(`/friends/requests/${id}/decline`).then((r) => r.data),
+  cancelRequest: (id) => api.post(`/friends/requests/${id}/cancel`).then((r) => r.data),
 };
 
 export const achievementsAPI = {
@@ -127,4 +134,9 @@ export const backupAPI = {
   getAll: (params) => api.get("/backup", { params }).then((r) => r.data),
   download: (filename) => `${API_BASE_URL}/backup/${filename}/download`,
   delete: (filename) => api.delete(`/backup/${filename}`).then((r) => r.data),
+};
+
+export const queryConsoleAPI = {
+  execute: (query) => api.post('/query-console/execute', { query }).then((r) => r.data),
+  getLogs: (params) => api.get('/query-console/logs', { params }).then((r) => r.data),
 };

@@ -1,15 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { registrationsAPI } from "../../services/api";
-import { useToast } from "../../context/ToastContext";
-import ConfirmModal from "../common/ConfirmModal";
 
 export default function MyRegistrations() {
-  const { showToast } = useToast();
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cancelling, setCancelling] = useState(null);
-  const [cancelTarget, setCancelTarget] = useState(null);
 
   useEffect(() => {
     fetchRegistrations();
@@ -25,22 +20,6 @@ export default function MyRegistrations() {
       setLoading(false);
     }
   };
-
-  const handleCancel = async (eventId) => {
-    setCancelling(eventId);
-    try {
-      const reg = registrations.find((r) => r.eventId === eventId);
-      if (reg) await registrationsAPI.cancel(reg.id);
-      setRegistrations((prev) => prev.filter((r) => r.eventId !== eventId));
-      showToast("success", "Registration cancelled.");
-    } catch (err) {
-      showToast("error", err.response?.data?.message || "Failed to cancel registration.");
-    } finally {
-      setCancelling(null);
-      setCancelTarget(null);
-    }
-  };
-
 
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
@@ -81,27 +60,10 @@ export default function MyRegistrations() {
                   Category: {reg.category}
                 </p>
               </div>
-              <button
-                onClick={() => setCancelTarget(reg.eventId)}
-                disabled={cancelling === reg.eventId}
-                className="btn btn-outlined"
-                style={{ fontSize: 13, padding: "6px 16px", flexShrink: 0 }}
-              >
-                {cancelling === reg.eventId ? "Cancelling..." : "Cancel"}
-              </button>
             </div>
           ))}
         </div>
       )}
-      <ConfirmModal
-        open={!!cancelTarget}
-        title="Cancel Registration"
-        message="Are you sure you want to cancel your registration for this event?"
-        confirmLabel="Yes, Cancel"
-        onConfirm={() => handleCancel(cancelTarget)}
-        onCancel={() => setCancelTarget(null)}
-        danger
-      />
     </div>
   );
 }

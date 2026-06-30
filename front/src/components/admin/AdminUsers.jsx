@@ -2,7 +2,21 @@ import { useState, useEffect, useCallback } from "react";
 import { adminUsersAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
-const ROLE_COLORS = { admin: "#FF7A00", organizer: "#2EC4B6", student: "#8A7A72" };
+const ROLE_COLORS = {
+  superadmin:  "#FF7A00",
+  developer:   "#6366f1",
+  coordinator: "#2EC4B6",
+  organizer:   "#2EC4B6",
+  student:     "#8A7A72",
+};
+
+const ROLE_LABELS = {
+  superadmin:  "Super Admin",
+  developer:   "Developer",
+  coordinator: "Co-Ordinator",
+  organizer:   "Organizer",
+  student:     "Student",
+};
 const STATUS_COLORS = { active: "#22c55e", suspended: "#ef4444" };
 
 function Badge({ label, color, bg }) {
@@ -152,7 +166,9 @@ export default function AdminUsers() {
           <option value="">All Roles</option>
           <option value="student">Student</option>
           <option value="organizer">Organizer</option>
-          <option value="admin">Admin</option>
+          <option value="superadmin">Super Admin</option>
+          <option value="developer">Developer</option>
+          <option value="coordinator">Co-Ordinator</option>
         </select>
         <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} style={{ padding: "10px 16px", border: "1.5px solid #E0E0E0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", outline: "none", background: "#fff", cursor: "pointer" }}>
           <option value="">All Statuses</option>
@@ -187,7 +203,7 @@ export default function AdminUsers() {
                     <tr key={u.id} style={{ borderTop: "1px solid #F0F0F0", transition: "background 0.1s" }} onMouseEnter={(e) => e.currentTarget.style.background = "#FAFAFA"} onMouseLeave={(e) => e.currentTarget.style.background = ""}>
                       <td style={{ padding: "14px 16px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: "50%", background: ROLE_COLORS[u.role] + "22", color: ROLE_COLORS[u.role], display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                          <div style={{ width: 36, height: 36, borderRadius: "50%", background: (ROLE_COLORS[u.role] || "#8A7A72") + "22", color: ROLE_COLORS[u.role] || "#8A7A72", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
                             {u.avatar ? <img src={u.avatar} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : u.fullName?.charAt(0)}
                           </div>
                           <div>
@@ -199,12 +215,14 @@ export default function AdminUsers() {
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#5A5A5A" }}>{u.email}</td>
                       <td style={{ padding: "14px 16px" }}>
                         {u.id === me?.id ? (
-                          <Badge label={u.role} color={ROLE_COLORS[u.role]} bg={ROLE_COLORS[u.role] + "22"} />
+                          <Badge label={ROLE_LABELS[u.role] || u.role} color={ROLE_COLORS[u.role] || "#8A7A72"} bg={(ROLE_COLORS[u.role] || "#8A7A72") + "22"} />
                         ) : (
-                          <select value={u.role} onChange={(e) => handleRoleChange(u, e.target.value)} disabled={actionLoading[u.id + "_role"]} style={{ border: "none", background: ROLE_COLORS[u.role] + "22", color: ROLE_COLORS[u.role], borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", textTransform: "capitalize" }}>
+                          <select value={u.role} onChange={(e) => handleRoleChange(u, e.target.value)} disabled={actionLoading[u.id + "_role"]} style={{ border: "none", background: (ROLE_COLORS[u.role] || "#8A7A72") + "22", color: ROLE_COLORS[u.role] || "#8A7A72", borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", textTransform: "capitalize" }}>
                             <option value="student">Student</option>
                             <option value="organizer">Organizer</option>
-                            <option value="admin">Admin</option>
+                            <option value="superadmin">Super Admin</option>
+                            <option value="developer">Developer</option>
+                            <option value="coordinator">Co-Ordinator</option>
                           </select>
                         )}
                       </td>
@@ -296,7 +314,9 @@ function CreateUserModal({ onClose, onCreated }) {
       <SelectField label="Role" value={form.role} onChange={set("role")}>
         <option value="student">Student</option>
         <option value="organizer">Organizer</option>
-        <option value="admin">Admin</option>
+        <option value="superadmin">Super Admin</option>
+        <option value="developer">Developer</option>
+        <option value="coordinator">Co-Ordinator</option>
       </SelectField>
       <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 8 }}>
         <button onClick={onClose} style={{ padding: "10px 20px", border: "1.5px solid #E0E0E0", borderRadius: 10, background: "none", fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>

@@ -2,7 +2,7 @@ import pool from '../../config/database.js';
 
 export const findById = async (id) => {
   const [rows] = await pool.query(
-    'SELECT id, username, email, fullName, role, status, avatar, cover_image, bio, xp, level, createdAt FROM users WHERE id = ?',
+    'SELECT id, username, email, fullName, role, status, avatar, cover_image, bio, createdAt FROM users WHERE id = ?',
     [id]
   );
   return rows[0] || null;
@@ -45,7 +45,7 @@ export const findAll = async ({ page = 1, limit = 20, role, status, search }) =>
   }
 
   const [rows] = await pool.query(
-    `SELECT id, username, email, fullName, role, status, avatar, cover_image, xp, level, createdAt
+    `SELECT id, username, email, fullName, role, status, avatar, cover_image, createdAt
      FROM users WHERE ${where} ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
     [...params, Number(limit), Number(offset)]
   );
@@ -68,25 +68,12 @@ export const create = async ({ username, email, password, fullName, role }) => {
 };
 
 export const countAdmins = async () => {
-  const [rows] = await pool.query("SELECT COUNT(*) as total FROM users WHERE role = 'admin'");
+  const [rows] = await pool.query(
+    "SELECT COUNT(*) as total FROM users WHERE role IN ('superadmin','developer','coordinator')"
+  );
   return rows[0].total;
 };
 
 export const remove = async (id) => {
   await pool.query('DELETE FROM users WHERE id = ?', [id]);
-};
-
-export const addXp = async (userId, amount) => {
-  const [rows] = await pool.query('SELECT xp, level FROM users WHERE id = ?', [userId]);
-  if (rows.length === 0) return { xp: 0, level: 1 };
-  let { xp, level } = rows[0];
-  xp += amount;
-  let leveledUp = false;
-  while (xp >= level * 100) {
-    xp -= level * 100;
-    level++;
-    leveledUp = true;
-  }
-  await pool.query('UPDATE users SET xp = ?, level = ? WHERE id = ?', [xp, level, userId]);
-  return { xp, level, leveledUp };
 };

@@ -54,15 +54,31 @@ export default function Login() {
             Sign in to continue exploring events, connecting with friends, and
             keeping your campus rhythm alive.
           </p>
-          <div className="auth-brand-card">
-            <div className="auth-brand-avatars">
-              <div className="auth-brand-avatar bg-[#FF7386] z-[3]">M</div>
-              <div className="auth-brand-avatar bg-[#2EC4B6] z-[2] -ml-3">K</div>
-              <div className="auth-brand-avatar bg-[#FDD348] z-[1] -ml-3">J</div>
+          <div className="auth-brand-card" style={{ padding: "16px 20px", background: "#fff" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#000", marginBottom: 12 }}>
+              Demo Accounts
             </div>
-            <div>
-              <div className="auth-brand-card-title">Join 2,400+ students</div>
-              <div className="auth-brand-card-sub">active on campus today</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 12 }}>
+              <div style={{ background: "#f5f5f5", borderRadius: 8, padding: "8px 12px" }}>
+                <div style={{ fontWeight: 700, color: "#000" }}>Super Admin</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>superadmin@unipulse.edu</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>SuperAdmin@123</div>
+              </div>
+              <div style={{ background: "#f5f5f5", borderRadius: 8, padding: "8px 12px" }}>
+                <div style={{ fontWeight: 700, color: "#000" }}>Developer</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>developer@unipulse.edu</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>Developer@123</div>
+              </div>
+              <div style={{ background: "#f5f5f5", borderRadius: 8, padding: "8px 12px" }}>
+                <div style={{ fontWeight: 700, color: "#000" }}>Coordinator</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>coordinator@unipulse.edu</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>Coordinator@123</div>
+              </div>
+              <div style={{ background: "#f5f5f5", borderRadius: 8, padding: "8px 12px" }}>
+                <div style={{ fontWeight: 700, color: "#000" }}>User (demo)</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>musich717@gmail.com</div>
+                <div style={{ color: "#000", fontFamily: "monospace" }}>qwerty</div>
+              </div>
             </div>
           </div>
         </div>
@@ -109,6 +125,11 @@ export default function Login() {
                   onChange={handleChange}
                   required
                 />
+              </div>
+              <div style={{ textAlign: "right", marginTop: 6 }}>
+                <Link to="/forgot-password" style={{ fontSize: 13, color: "#FF7A00", fontWeight: 600, textDecoration: "none" }}>
+                  Forgot Password?
+                </Link>
               </div>
             </div>
 

@@ -2,6 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { adminAPI, backupAPI, usersAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
+// Roles allowed to see each settings tab
+const TAB_ROLES = {
+  profile: ["superadmin", "developer", "coordinator"],
+  health:  ["superadmin", "developer"],
+  backup:  ["superadmin", "developer"],
+};
+
 // ─── shared ──────────────────────────────────────────────────────────────────
 
 function Toast({ msg, ok }) {
@@ -325,7 +332,7 @@ function BackupRecoveryTab() {
           <div style={{ background: "#F9F9F9", borderRadius: 10, padding: "16px 20px", marginBottom: 20 }}>
             <div style={{ fontWeight: 600, fontSize: 14, color: "#333", marginBottom: 8 }}>Included Tables</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {["users", "events", "registrations", "friends", "achievements", "user_achievements", "activity_logs", "reports", "upcoming_events", "past_event_history", "saved_events"].map((t) => (
+              {["users", "events", "registrations", "friends", "achievements", "user_achievements", "streaks", "activity_logs", "reports", "upcoming_events", "past_event_history", "saved_events"].map((t) => (
                 <span key={t} style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 8, background: "rgba(46,196,182,0.12)", color: "#2EC4B6" }}>{t}</span>
               ))}
             </div>
@@ -521,14 +528,17 @@ function BackupRecoveryTab() {
 
 // ─── Main AdminSettings component ────────────────────────────────────────────
 
-const TABS = [
+const ALL_TABS = [
   { key: "profile", label: "Admin Profile" },
   { key: "health", label: "System Health" },
   { key: "backup", label: "Backup & Recovery" },
 ];
 
 export default function AdminSettings() {
-  const [tab, setTab] = useState("profile");
+  const { user } = useAuth();
+  const role = user?.role || "superadmin";
+  const TABS = ALL_TABS.filter((t) => (TAB_ROLES[t.key] || []).includes(role));
+  const [tab, setTab] = useState(TABS[0]?.key || "profile");
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

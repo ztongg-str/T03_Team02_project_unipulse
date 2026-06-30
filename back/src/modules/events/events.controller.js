@@ -46,6 +46,15 @@ export const createEvent = async (req, res, next) => {
   }
 };
 
+export const saveDraft = async (req, res, next) => {
+  try {
+    const event = await eventsService.saveDraft({ ...req.body, organizerId: req.user.id });
+    return created(res, event, 'Draft saved successfully');
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 400);
+  }
+};
+
 export const updateEvent = async (req, res, next) => {
   try {
     const event = await eventsService.updateEvent(req.params.id, req.body, req.user);

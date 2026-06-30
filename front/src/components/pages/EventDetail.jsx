@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { eventsAPI, registrationsAPI, savedEventsAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-import ConfirmModal from "../common/ConfirmModal";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -15,7 +14,6 @@ export default function EventDetail() {
   const [registering, setRegistering] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
 
   useEffect(() => {
     fetchEvent();
@@ -81,20 +79,6 @@ export default function EventDetail() {
     }
   };
 
-  const handleCancelRegistration = async () => {
-    setShowCancelModal(false);
-    setRegistering(true);
-    try {
-      await registrationsAPI.cancelByEvent(Number(id));
-      setRegistered(false);
-      showToast("success", "Registration cancelled.");
-    } catch (err) {
-      showToast("error", err.response?.data?.message || "Failed to cancel registration");
-    } finally {
-      setRegistering(false);
-    }
-  };
-
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
       weekday: "long",
@@ -130,7 +114,23 @@ export default function EventDetail() {
         <div className="event-detail-meta">
           <span>&#128197; {formatDate(event.date)}</span>
           <span>&#128338; {formatTime(event.date)}</span>
-          <span>&#128205; {event.location}</span>
+          <span>&#128205;{" "}
+            {event.location?.includes(",") ? (
+              <a
+                href={`https://www.google.com/maps?q=${event.location}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-orange-100 text-orange-700 text-sm font-semibold hover:bg-orange-200 transition"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                {event.location}
+              </a>
+            ) : (
+              event.location
+            )}
+          </span>
           <span>&#128100; {event.organizerName}</span>
           <span>
             <span className={`badge ${event.status === "approved" ? "badge-green" : "badge-yellow"}`}>
@@ -155,13 +155,9 @@ export default function EventDetail() {
         <div className="event-detail-actions">
           {user ? (
             registered ? (
-              <button
-                className="btn btn-outlined"
-                onClick={() => setShowCancelModal(true)}
-                disabled={registering}
-              >
-                {registering ? "Cancelling..." : "Cancel Registration"}
-              </button>
+              <span className="badge badge-green" style={{ fontSize: 14, padding: "10px 20px" }}>
+                You're registered
+              </span>
             ) : (
               <button
                 className="btn btn-primary"
@@ -187,11 +183,6 @@ export default function EventDetail() {
               {saved ? "Saved" : "Save Event"}
             </button>
           )}
-          {registered && (
-            <span className="badge badge-green" style={{ fontSize: 14, padding: "10px 20px" }}>
-              You're registered
-            </span>
-          )}
           <button
             className="btn btn-secondary"
             onClick={() => navigate("/events")}
@@ -200,15 +191,6 @@ export default function EventDetail() {
           </button>
         </div>
       </div>
-      <ConfirmModal
-        open={showCancelModal}
-        title="Cancel Registration"
-        message="Are you sure you want to cancel your registration for this event?"
-        confirmLabel="Yes, Cancel"
-        onConfirm={handleCancelRegistration}
-        onCancel={() => setShowCancelModal(false)}
-        danger
-      />
     </div>
   );
 }

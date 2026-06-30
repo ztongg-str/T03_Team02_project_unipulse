@@ -27,6 +27,22 @@ export const createEvent = async (data) => {
   return eventsRepository.findById(eventId);
 };
 
+export const saveDraft = async (data) => {
+  const sanitized = {
+    title: data.title || 'Untitled Draft',
+    description: data.description || ' ',
+    date: data.date ? new Date(data.date).toISOString().slice(0, 19).replace('T', ' ') : new Date(Date.now() + 86400000).toISOString().slice(0, 19).replace('T', ' '),
+    location: data.location || ' ',
+    category: data.category || 'other',
+    maxParticipants: data.maxParticipants || 100,
+    image: data.image || null,
+    organizerId: data.organizerId,
+    status: 'draft',
+  };
+  const eventId = await eventsRepository.create(sanitized);
+  return eventsRepository.findById(eventId);
+};
+
 export const updateEvent = async (id, data, user) => {
   const event = await eventsRepository.findById(id);
   if (!event) {
@@ -34,7 +50,8 @@ export const updateEvent = async (id, data, user) => {
     err.statusCode = 404;
     throw err;
   }
-  if (user.role !== 'admin' && event.organizerId !== user.id) {
+  const ADMIN_ROLES = ['superadmin', 'developer', 'coordinator'];
+  if (!ADMIN_ROLES.includes(user.role) && event.organizerId !== user.id) {
     const err = new Error('Not authorized to update this event');
     err.statusCode = 403;
     throw err;
@@ -56,7 +73,7 @@ export const deleteEvent = async (id, user) => {
     err.statusCode = 404;
     throw err;
   }
-  if (user.role !== 'admin' && event.organizerId !== user.id) {
+  if (!ADMIN_ROLES.includes(user.role) && event.organizerId !== user.id) {
     const err = new Error('Not authorized to delete this event');
     err.statusCode = 403;
     throw err;

@@ -7,6 +7,7 @@ import Landing from "./components/pages/Landing";
 import { authAPI } from "./services/api";
 import Login from "./components/pages/Login";
 import Register from "./components/pages/Register";
+import ForgotPassword from "./components/pages/ForgotPassword";
 import Events from "./components/pages/Events";
 import EventDetail from "./components/pages/EventDetail";
 import MyRegistrations from "./components/pages/MyRegistrations";
@@ -31,6 +32,7 @@ import AdminUsers from "./components/admin/AdminUsers";
 import AdminEvents from "./components/admin/AdminEvents";
 import AdminVerification from "./components/admin/AdminVerification";
 import AdminSettings from "./components/admin/AdminSettings";
+import AdminQueryConsole from "./components/admin/AdminQueryConsole";
 import AdminLayout from "./components/admin/AdminLayout";
 
 function HomeRedirect() {
@@ -41,7 +43,7 @@ function HomeRedirect() {
     if (loading) return;
     if (!user) return;
 
-    if (user.role === "admin") {
+    if (["superadmin", "developer", "coordinator"].includes(user.role)) {
       navigate("/admin/dashboard", { replace: true });
     } else if (user.role === "organizer") {
       authAPI.switchRole()
@@ -69,11 +71,13 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+const ADMIN_ROLES = ["superadmin", "developer", "coordinator"];
+
 function AdminRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== "admin") return <Navigate to="/" replace />;
+  if (!ADMIN_ROLES.includes(user.role)) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -91,6 +95,7 @@ function App() {
             <Route path="/admin/events/edit/:id" element={<EditEvent />} />
             <Route path="/admin/verification" element={<AdminVerification />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/query-console" element={<AdminQueryConsole />} />
           </Route>
 
           {/* ── Organizer Portal ── */}
@@ -111,6 +116,7 @@ function App() {
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/events" element={<Events />} />
             <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />

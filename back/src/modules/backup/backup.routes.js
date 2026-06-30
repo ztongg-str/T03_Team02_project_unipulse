@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import * as backupController from './backup.controller.js';
 import { authenticate } from '../../middlewares/authMiddleware.js';
-import { authorize } from '../../middlewares/roleMiddleware.js';
+import { requirePermission } from '../../middlewares/roleMiddleware.js';
 
 const router = Router();
 
-router.use(authenticate, authorize('admin'));
+router.use(authenticate, requirePermission('backup'));
 
 router.get('/tables', backupController.listTables);
 router.get('/tables/:table/preview', backupController.previewRows);

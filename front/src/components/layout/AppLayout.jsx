@@ -8,7 +8,7 @@ export default function AppLayout() {
   const { user } = useAuth();
 
   // Admins always live inside AdminLayout — redirect if they somehow land here.
-  if (user?.role === "admin") {
+  if (["superadmin", "developer", "coordinator"].includes(user?.role)) {
     return <Navigate to="/admin/dashboard" replace />;
   }
 

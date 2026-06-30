@@ -4,15 +4,17 @@ import { friendsAPI, savedEventsAPI } from "../../services/api";
 
 const CATEGORIES = [
   { id: "all", label: "All Friends", icon: "users" },
-  { id: "online", label: "Online Now", icon: "circle" },
+  { id: "requests", label: "Requests", icon: "user-plus" },
   { id: "saved", label: "Saved", icon: "bookmark" },
-  { id: "pending", label: "Pending Requests", icon: "clock" },
 ];
 
 export default function Friends() {
   const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
+  const [discover, setDiscover] = useState([]);
   const [savedEvents, setSavedEvents] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -23,6 +25,9 @@ export default function Friends() {
 
   useEffect(() => {
     fetchFriends();
+    fetchDiscover();
+    fetchPendingRequests();
+    fetchSentRequests();
   }, []);
 
   useEffect(() => {
@@ -39,6 +44,33 @@ export default function Friends() {
       setFriends([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDiscover = async () => {
+    try {
+      const res = await friendsAPI.discover();
+      setDiscover(res.data || []);
+    } catch {
+      setDiscover([]);
+    }
+  };
+
+  const fetchPendingRequests = async () => {
+    try {
+      const res = await friendsAPI.getPending();
+      setPendingRequests(res.data || []);
+    } catch {
+      setPendingRequests([]);
+    }
+  };
+
+  const fetchSentRequests = async () => {
+    try {
+      const res = await friendsAPI.getSent();
+      setSentRequests(res.data || []);
+    } catch {
+      setSentRequests([]);
     }
   };
 
@@ -86,9 +118,32 @@ export default function Friends() {
       setMsg({ type: "success", text: "Friend request sent!" });
       setSearchResults([]);
       setSearchQuery("");
-      fetchFriends();
+      fetchDiscover();
+      fetchSentRequests();
     } catch (err) {
       setMsg({ type: "error", text: err.response?.data?.message || "Failed to send request" });
+    }
+  };
+
+  const handleAccept = async (requestId) => {
+    try {
+      await friendsAPI.acceptRequest(requestId);
+      setMsg({ type: "success", text: "Friend request accepted!" });
+      fetchPendingRequests();
+      fetchFriends();
+      fetchDiscover();
+    } catch (err) {
+      setMsg({ type: "error", text: err.response?.data?.message || "Failed to accept request" });
+    }
+  };
+
+  const handleDecline = async (requestId) => {
+    try {
+      await friendsAPI.declineRequest(requestId);
+      setMsg({ type: "success", text: "Friend request declined" });
+      fetchPendingRequests();
+    } catch (err) {
+      setMsg({ type: "error", text: err.response?.data?.message || "Failed to decline request" });
     }
   };
 
@@ -98,60 +153,34 @@ export default function Friends() {
       await friendsAPI.remove(id);
       setMsg({ type: "success", text: "Friend removed" });
       fetchFriends();
+      fetchDiscover();
     } catch (err) {
       setMsg({ type: "error", text: err.response?.data?.message || "Failed to remove" });
     }
   };
 
-  const handleAccept = async (userId) => {
-    try {
-      await friendsAPI.add(userId);
-      setMsg({ type: "success", text: "Friend request accepted!" });
-      fetchFriends();
-    } catch (err) {
-      setMsg({ type: "error", text: err.response?.data?.message || "Failed to accept" });
-    }
-  };
-
-  const handleDecline = async (userId) => {
-    try {
-      await friendsAPI.remove(userId);
-      setMsg({ type: "success", text: "Friend request declined" });
-      fetchFriends();
-    } catch (err) {
-      setMsg({ type: "error", text: err.response?.data?.message || "Failed to decline" });
-    }
-  };
-
-  const getStatusDot = (status) => {
-    if (status === "online") return { bg: "bg-green-500", label: "Online" };
-    if (status === "away") return { bg: "bg-yellow", label: "Away" };
-    return { bg: "bg-gray-300", label: "Offline" };
-  };
-
-  const filteredFriends = activeCategory === "all" || activeCategory === "online"
+  const filteredFriends = activeCategory === "all"
     ? friends
     : [];
 
-  const suggestedFriends = [
-    { id: "s1", name: "Maria Santos", username: "maria.s", mutual: 3 },
-    { id: "s2", name: "Jose Garcia", username: "jose.g", mutual: 5 },
-    { id: "s3", name: "Ana Cruz", username: "ana.c", mutual: 2 },
-  ];
+  const isFriend = (userId) => friends.some((f) => f.friendId === userId);
+
+  const hasPendingRequest = (userId) =>
+    pendingRequests.some((r) => r.fromUserId === userId);
+
+  const hasSentRequest = (userId) =>
+    sentRequests.some((r) => r.toUserId === userId);
 
   const categoryIcon = (icon, active) => {
     const color = active ? "#FF7A00" : "currentColor";
     if (icon === "users") {
       return <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="7" cy="5" r="3" stroke={color} strokeWidth="2"/><circle cx="11" cy="5" r="3" stroke={color} strokeWidth="2"/><path d="M2 15c0-3 2-5 5-5h4c3 0 5 2 5 5" stroke={color} strokeWidth="2" strokeLinecap="round"/></svg>;
     }
-    if (icon === "circle") {
-      return <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke={color} strokeWidth="2"/><circle cx="9" cy="9" r="3" fill={color}/></svg>;
+    if (icon === "user-plus") {
+      return <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="7" cy="5" r="3" stroke={color} strokeWidth="2"/><path d="M12 5v6M15 8h-6" stroke={color} strokeWidth="2" strokeLinecap="round"/><path d="M2 14c0-3 2-5 5-5h3" stroke={color} strokeWidth="2" strokeLinecap="round"/></svg>;
     }
     if (icon === "bookmark") {
       return <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2h10v14l-5-4-5 4V2z" stroke={color} strokeWidth="2" strokeLinejoin="round"/></svg>;
-    }
-    if (icon === "clock") {
-      return <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke={color} strokeWidth="2"/><path d="M9 5v4l3 2" stroke={color} strokeWidth="2" strokeLinecap="round"/></svg>;
     }
     return null;
   };
@@ -172,48 +201,58 @@ export default function Friends() {
             >
               {categoryIcon(cat.icon, activeCategory === cat.id)}
               <span>{cat.label}</span>
-              {cat.id === "pending" && (
-                <span className="friends-pending-count">2</span>
+              {cat.id === "requests" && pendingRequests.length > 0 && (
+                <span className="friends-pending-count">{pendingRequests.length}</span>
               )}
-            </button>
+              </button>
           ))}
         </nav>
-
-        <div className="friends-pending-section">
-          <h3 className="friends-pending-title">Pending Requests</h3>
-          {[
-            { id: "p1", name: "Clara Reyes", username: "clara.r", club: "Music Club" },
-            { id: "p2", name: "Mark Lim", username: "mark.l", club: "Sports Club" },
-          ].map((req) => (
-            <div key={req.id} className="friends-pending-card">
-              <div className="friends-pending-avatar">
-                {req.name.charAt(0)}
-              </div>
-              <div className="friends-pending-info">
-                <div className="friends-pending-name">{req.name}</div>
-                <div className="friends-pending-club">{req.club}</div>
-              </div>
-              <div className="friends-pending-actions">
-                <button className="friends-pending-accept" onClick={() => handleAccept(req.id)}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2 7l4 4 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </button>
-                <button className="friends-pending-decline" onClick={() => handleDecline(req.id)}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
       </aside>
 
       <div className="friends-content">
         {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
 
-        {activeCategory === "saved" ? (
+        {activeCategory === "requests" ? (
+          <>
+            <div className="friends-section-header">
+              <h3 className="friends-section-title">
+                Pending Requests
+                <span className="friends-count"> ({pendingRequests.length})</span>
+              </h3>
+            </div>
+
+            {pendingRequests.length === 0 ? (
+              <div className="empty-state">
+                <h3>No pending requests</h3>
+                <p>When someone sends you a friend request, it will appear here</p>
+              </div>
+            ) : (
+              <div className="friends-pending-section">
+                {pendingRequests.map((req) => (
+                  <div key={req.id} className="friends-pending-card">
+                    <div className="friends-pending-avatar overflow-hidden">
+                      {req.avatar ? (
+                        <img src={`http://localhost:4000${req.avatar}`} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        req.fullName?.charAt(0) || req.username?.charAt(0)
+                      )}
+                    </div>
+                    <div className="friend-card-name">{req.fullName}</div>
+                    <div className="friend-card-username">@{req.username}</div>
+                    <div className="friends-pending-actions">
+                      <button className="friends-pending-accept" onClick={() => handleAccept(req.id)}>
+                        Accept
+                      </button>
+                      <button className="friends-pending-decline" onClick={() => handleDecline(req.id)}>
+                        Decline
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : activeCategory === "saved" ? (
           <>
             <div className="friends-section-header">
               <h3 className="friends-section-title">
@@ -285,9 +324,23 @@ export default function Friends() {
                       </div>
                       <div className="friend-card-name">{u.fullName || u.username}</div>
                       <div className="friend-card-username">@{u.username}</div>
-                      <button className="friend-card-add-btn" onClick={() => handleAdd(u.id)}>
-                        Add Friend
-                      </button>
+                      {u.friendStatus === 'accepted' || isFriend(u.id) ? (
+                        <button className="friend-card-add-btn" disabled style={{ opacity: 0.6 }}>
+                          Friends
+                        </button>
+                      ) : u.friendStatus === 'sent' || hasSentRequest(u.id) ? (
+                        <button className="friend-card-add-btn" disabled style={{ opacity: 0.6 }}>
+                          Request Sent
+                        </button>
+                      ) : u.friendStatus === 'received' || hasPendingRequest(u.id) ? (
+                        <button className="friend-card-add-btn" disabled style={{ opacity: 0.6 }}>
+                          Respond
+                        </button>
+                      ) : (
+                        <button className="friend-card-add-btn" onClick={() => handleAdd(u.id)}>
+                          Add Friend
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -296,7 +349,7 @@ export default function Friends() {
 
             <div className="friends-section-header">
               <h3 className="friends-section-title">
-                {CATEGORIES.find(c => c.id === activeCategory)?.label || "All Friends"}
+                All Friends
                 <span className="friends-count"> ({filteredFriends.length})</span>
               </h3>
             </div>
@@ -308,9 +361,7 @@ export default function Friends() {
               </div>
             ) : (
               <div className="friends-grid">
-                {filteredFriends.map((f) => {
-                  const status = getStatusDot(["online", "away"][Math.floor(Math.random() * 2)]);
-                  return (
+                {filteredFriends.map((f) => (
                     <Link key={f.id} to={`/friends/profile/${f.friendId}`} className="friend-status-card">
                       <div className="friend-card-top">
                         <div className="friend-card-avatar overflow-hidden">
@@ -320,46 +371,54 @@ export default function Friends() {
                             f.fullName?.charAt(0) || f.username?.charAt(0)
                           )}
                         </div>
-                        <div className={`friend-status-dot ${status.bg}`} title={status.label} />
                       </div>
                       <div className="friend-card-name">{f.fullName}</div>
                       <div className="friend-card-username">@{f.username}</div>
-                      <div className="friend-card-status">Living my best campus life 🎉</div>
-                      <div className="friend-card-mutual">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                          <circle cx="5" cy="4" r="2.5" stroke="#85736B" strokeWidth="1.5"/>
-                          <circle cx="9" cy="4" r="2.5" stroke="#85736B" strokeWidth="1.5"/>
-                          <path d="M1 12c0-2.5 2-4 4-4h4c2 0 4 1.5 4 4" stroke="#85736B" strokeWidth="1.5" strokeLinecap="round"/>
-                        </svg>
-                        <span>{Math.floor(Math.random() * 8) + 1} mutual connections</span>
-                      </div>
                       <button className="friend-card-remove" onClick={(e) => { e.preventDefault(); handleRemove(f.id); }}>
                         Remove
                       </button>
                     </Link>
-                  );
-                })}
+                  ))}
               </div>
             )}
 
-            <div className="friends-suggested">
-              <h3 className="friends-section-title">Suggested for You</h3>
-              <div className="friends-suggested-grid">
-                {suggestedFriends.map((sf) => (
-                  <div key={sf.id} className="friend-suggested-card">
-                    <div className="friend-card-avatar w-12 h-12 text-lg">
-                      {sf.name.charAt(0)}
+            {discover.length > 0 && (
+              <div className="friends-suggested">
+                <h3 className="friends-section-title">People you may know</h3>
+                <div className="friends-suggested-grid">
+                  {discover.map((u) => (
+                    <div key={u.id} className="friend-suggested-card">
+                      <div className="friend-card-avatar w-12 h-12 text-lg">
+                        {u.avatar ? (
+                          <img src={`http://localhost:4000${u.avatar}`} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          u.fullName?.charAt(0) || u.username?.charAt(0)
+                        )}
+                      </div>
+                      <div className="friend-card-name">{u.fullName || u.username}</div>
+                      <div className="friend-card-username">@{u.username}</div>
+                      {isFriend(u.id) ? (
+                        <button className="friend-card-invite" disabled style={{ opacity: 0.6 }}>
+                          Friends
+                        </button>
+                      ) : hasSentRequest(u.id) ? (
+                        <button className="friend-card-invite" disabled style={{ opacity: 0.6 }}>
+                          Request Sent
+                        </button>
+                      ) : hasPendingRequest(u.id) ? (
+                        <button className="friend-card-invite" disabled style={{ opacity: 0.6 }}>
+                          Respond
+                        </button>
+                      ) : (
+                        <button className="friend-card-invite" onClick={() => handleAdd(u.id)}>
+                          Add Friend
+                        </button>
+                      )}
                     </div>
-                    <div className="friend-card-name">{sf.name}</div>
-                    <div className="friend-card-username">@{sf.username}</div>
-                    <div className="friend-card-mutual">{sf.mutual} mutual connections</div>
-                    <button className="friend-card-invite" onClick={() => handleAdd(sf.id)}>
-                      Invite
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>
