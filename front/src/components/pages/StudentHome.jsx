@@ -108,7 +108,7 @@ export default function StudentHome() {
       <section style={{ marginBottom: 48 }}>
         <div className="sh-section-header">
           <h2>Your Upcoming Events</h2>
-          {upcoming.length > 0 && <Link to="/history" className="sh-view-all">View All</Link>}
+          {upcoming.length > 0 && <Link to="/upcoming" className="sh-view-all">View All</Link>}
         </div>
         {upcoming.length === 0 ? (
           <div className="sh-empty">

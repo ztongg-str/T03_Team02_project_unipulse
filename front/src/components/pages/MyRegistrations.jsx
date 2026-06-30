@@ -29,7 +29,8 @@ export default function MyRegistrations() {
   const handleCancel = async (eventId) => {
     setCancelling(eventId);
     try {
-      await registrationsAPI.cancelByEvent(eventId);
+      const reg = registrations.find((r) => r.eventId === eventId);
+      if (reg) await registrationsAPI.cancel(reg.id);
       setRegistrations((prev) => prev.filter((r) => r.eventId !== eventId));
       showToast("success", "Registration cancelled.");
     } catch (err) {
@@ -39,6 +40,7 @@ export default function MyRegistrations() {
       setCancelTarget(null);
     }
   };
+
 
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString("en-US", {

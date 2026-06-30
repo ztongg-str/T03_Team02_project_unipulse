@@ -34,7 +34,7 @@ export default function EditEvent() {
   const fetchEvent = async () => {
     try {
       const res = await eventsAPI.getById(id);
-      const ev = res.event || res.data?.event || res;
+      const ev = res.data?.event || res.data || res;
       setForm({
         title: ev.title || "",
         description: ev.description || "",

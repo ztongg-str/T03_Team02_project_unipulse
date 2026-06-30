@@ -26,7 +26,8 @@
     "multer": "^2.2.0",
     "mysql2": "^3.14.1",
     "node": "^26.3.1",
-    "node-cron": "^4.5.0"
+    "node-cron": "^4.5.0",
+    "nodemailer": "^9.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

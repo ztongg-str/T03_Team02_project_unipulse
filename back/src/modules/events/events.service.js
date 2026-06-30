@@ -27,27 +27,6 @@ export const createEvent = async (data) => {
   return eventsRepository.findById(eventId);
 };
 
-export const saveDraft = async (data) => {
-  const eventId = await eventsRepository.create({ ...data, status: 'draft' });
-  return eventsRepository.findById(eventId);
-};
-
-export const publishEvent = async (id, user) => {
-  const event = await eventsRepository.findById(id);
-  if (!event) {
-    const err = new Error('Event not found');
-    err.statusCode = 404;
-    throw err;
-  }
-  if (event.organizerId !== user.id) {
-    const err = new Error('Not authorized to publish this event');
-    err.statusCode = 403;
-    throw err;
-  }
-  await eventsRepository.update(id, { status: 'pending' });
-  return eventsRepository.findById(id);
-};
-
 export const updateEvent = async (id, data, user) => {
   const event = await eventsRepository.findById(id);
   if (!event) {

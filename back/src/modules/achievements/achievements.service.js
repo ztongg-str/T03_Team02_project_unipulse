@@ -1,5 +1,4 @@
 import * as achievementsRepository from './achievements.repository.js';
-import * as usersRepository from '../users/users.repository.js';
 
 export const getMyAchievements = async (userId) => {
   return achievementsRepository.findByUserId(userId);
@@ -68,12 +67,20 @@ export const checkAndGrant = async (userId, actionType) => {
       return count >= 5;
     },
     level_5: async () => {
-      const user = await usersRepository.findById(userId);
+      const user = await achievementsRepository._getUserLevel(userId);
       return user && user.level >= 5;
     },
     level_10: async () => {
-      const user = await usersRepository.findById(userId);
+      const user = await achievementsRepository._getUserLevel(userId);
       return user && user.level >= 10;
+    },
+    complete_profile: async () => {
+      const user = await achievementsRepository._getUserProfile(userId);
+      return !!(user && user.bio && user.fullName);
+    },
+    book_5_events: async () => {
+      const count = await achievementsRepository.countRegistrations(userId);
+      return count >= 5;
     },
   };
 

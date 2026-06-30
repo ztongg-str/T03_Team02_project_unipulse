@@ -35,7 +35,7 @@ export default function Landing() {
           </p>
           <div className="flex gap-4 items-center">
             <Link to="/login" className="btn btn-primary btn-lg">
-              Get Start
+              Get Started
               <span className="text-xl">{'\u2192'}</span>
             </Link>
             <Link to="/events" className="btn btn-secondary btn-lg">

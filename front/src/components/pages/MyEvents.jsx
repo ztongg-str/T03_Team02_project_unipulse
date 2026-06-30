@@ -75,7 +75,7 @@ export default function MyEvents() {
     setDeleting(id);
     try {
       await eventsAPI.delete(id);
-      setEvents((prev) => prev.filter((e) => e.id !== id && e._id !== id));
+      setEvents((prev) => prev.filter((e) => e.id !== id || e._id !== id));
       showToast("success", "Event deleted.");
     } catch {
       showToast("error", "Failed to delete event.");

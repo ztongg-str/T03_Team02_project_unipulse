@@ -10,8 +10,8 @@ export default function Footer() {
       <div className="footer-inner">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-6 md:gap-0 min-h-16">
           <div className=" flex flex-col text-center min-w-full">
-            <div className="text-2xl font-extrabold text-orange mb-1">Unipulse</div>
-            <div className="text-sm md:text-base text-kabul">&copy; 2024 Unipulse University Community. All rights reserved.</div>
+            <div className="text-2xl font-extrabold text-orange mb-1">UniPulse</div>
+            <div className="text-sm md:text-base text-kabul">&copy; 2024 UniPulse University Community. All rights reserved.</div>
           </div>
           <div className="footer-links">
             <Link to="/" className="text-base font-bold text-kabul">Home</Link>

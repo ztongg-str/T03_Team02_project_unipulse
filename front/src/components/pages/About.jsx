@@ -27,7 +27,7 @@ export default function About() {
           <li>Browse and discover campus events</li>
           <li>Register for events with one click</li>
           <li>Connect with friends and build your community</li>
-           <li>Earn achievements and level up</li>
+            <li>Earn achievements and level up</li>
           <li>Personalized event recommendations</li>
         </ul>
       </div>

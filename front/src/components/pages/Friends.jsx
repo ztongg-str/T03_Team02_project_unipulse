@@ -129,11 +129,9 @@ export default function Friends() {
     return { bg: "bg-gray-300", label: "Offline" };
   };
 
-  const filteredFriends = activeCategory === "all"
+  const filteredFriends = activeCategory === "all" || activeCategory === "online"
     ? friends
-    : activeCategory === "online"
-      ? friends.filter(() => Math.random() > 0.5)
-      : [];
+    : [];
 
   const suggestedFriends = [
     { id: "s1", name: "Maria Santos", username: "maria.s", mutual: 3 },

@@ -29,7 +29,7 @@ export const register = async ({ username, email, password, fullName }) => {
 
   return {
     token,
-    user: { id: userId, username, email, fullName, role: 'student', xp: 0, level: 1 },
+    user: { id: userId, username, email, fullName, role: 'student' },
   };
 };
 
@@ -58,8 +58,6 @@ export const login = async ({ email, password }) => {
       email: user.email,
       fullName: user.fullName,
       role: user.role,
-      xp: user.xp || 0,
-      level: user.level || 1,
     },
   };
 };

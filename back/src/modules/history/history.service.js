@@ -32,7 +32,7 @@ export const markAttendance = async (registrationId, organizerId, attended) => {
     err.statusCode = 409;
     throw err;
   }
-  const xpEarned = attended ? 10 : 0;
+  const xpEarned = attended ? 50 : 0;
   const historyId = await historyRepository.create({
     userId: registration.userId,
     eventId: registration.eventId,

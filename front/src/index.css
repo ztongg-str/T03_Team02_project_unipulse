@@ -848,6 +848,7 @@ input, textarea, select { font-family: inherit; outline: none; }
   margin-bottom: 28px;
   padding-left: 232px;
   min-height: 140px;
+  min-height: 120px;
 }
 
 .profile-avatar-large {
@@ -906,14 +907,6 @@ input, textarea, select { font-family: inherit; outline: none; }
   box-shadow: 0 2px 8px var(--color-card-shadow);
   flex-shrink: 0;
   min-width: 160px;
-}
-
-.profile-level-value {
-  font-size: 30px;
-  font-weight: 800;
-  color: var(--color-orange);
-  line-height: 1;
-  margin-bottom: 8px;
 }
 
 .profile-xp-bar-wrapper {
@@ -2011,7 +2004,7 @@ input, textarea, select { font-family: inherit; outline: none; }
   color: var(--color-judge-gray);
 }
 
-/* ======== LEVEL (replaces streaks) ======== */
+/* ======== LEVEL ======== */
 
 /* ======== REGISTRATIONS ======== */
 .registration-card {
@@ -3729,6 +3722,8 @@ input, textarea, select { font-family: inherit; outline: none; }
 /* ── Streaks ── */
 @media (max-width: 768px) {
   /* streak styles removed */
+  .streak-display { flex-direction: column; align-items: center; }
+  .streak-box { max-width: 100%; width: 100%; }
 }
 
 /* ── StudentHome ── */

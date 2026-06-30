@@ -93,6 +93,7 @@ export default function Events() {
     } catch {}
   };
 
+
   const toggleSave = async (eventId) => {
     try {
       if (savedIds.has(eventId)) {
@@ -191,13 +192,14 @@ export default function Events() {
               Recommended based on your interests and major
             </p>
           </div>
-          <Link to="/events" className="flex items-center gap-1 text-wild-watermelon font-bold text-base">
-            View All
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" 
-className="">
-              <path d="M6 3l5 5-5 5" stroke="var(--wild-watermelon)" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </Link>
+          {events.length > 12 && (
+            <Link to="/events" className="flex items-center gap-1 text-wild-watermelon font-bold text-base">
+              View All
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="">
+                <path d="M6 3l5 5-5 5" stroke="var(--wild-watermelon)" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </Link>
+          )}
         </div>
 
         {loading ? (

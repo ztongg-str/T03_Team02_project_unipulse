@@ -5,6 +5,7 @@ import cors from 'cors';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
 
 import authRoutes from './modules/auth/auth.routes.js';
+import otpRoutes from './modules/auth/otp.routes.js';
 import usersRoutes from './modules/users/users.routes.js';
 import eventsRoutes from './modules/events/events.routes.js';
 import registrationsRoutes from './modules/registrations/registrations.routes.js';
@@ -34,6 +35,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/otp', otpRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/registrations', registrationsRoutes);

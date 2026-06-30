@@ -50,21 +50,6 @@ export const cancelRegistration = async (id, user) => {
 };
 
 export const cancelRegistrationByEvent = async (eventId, user) => {
-  const registration = await registrationsRepository.findByUserAndEvent(user.id, eventId);
-  if (!registration) {
-    const err = new Error('Registration not found');
-    err.statusCode = 404;
-    throw err;
-  }
-  await registrationsRepository.remove(registration.id);
-};
-
-export const checkRegistration = async (userId, eventId) => {
-  const registration = await registrationsRepository.findByUserAndEvent(userId, eventId);
-  return !!registration;
-};
-
-export const cancelRegistrationByEvent = async (eventId, user) => {
   const existing = await registrationsRepository.findByUserAndEvent(user.id, eventId);
   if (!existing) {
     const err = new Error('Registration not found');

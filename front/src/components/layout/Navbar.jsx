@@ -4,23 +4,23 @@ import { useAuth } from "../../context/AuthContext";
 import { authAPI } from "../../services/api";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
+    setShowLogoutModal(false);
     logout();
-    navigate("/");
+    setTimeout(() => navigate("/"), 0);
   };
 
   const handleCreateEvent = async () => {
     try {
       const res = await authAPI.switchRole();
       localStorage.setItem("token", res.data.token);
-      setTimeout(() => {
-        navigate("/organizer/dashboard");
-      }, 100);
+      updateUser(res.data.user);
+      navigate("/organizer/dashboard");
     } catch (err) {
       console.error("switchRole error:", err);
       navigate("/login", { state: { redirectTo: "/organizer/dashboard" } });
@@ -44,6 +44,7 @@ export default function Navbar() {
                 <NavLink to="/" className={navLinkClass} onClick={() => setMenuOpen(false)}>Home</NavLink>
                 <NavLink to="/events" className={navLinkClass} onClick={() => setMenuOpen(false)}>Events</NavLink>
                 <NavLink to="/friends" className={navLinkClass} onClick={() => setMenuOpen(false)}>Community</NavLink>
+                <NavLink to="/upcoming" className={navLinkClass} onClick={() => setMenuOpen(false)}>Upcoming</NavLink>
                 <NavLink to="/history" className={navLinkClass} onClick={() => setMenuOpen(false)}>History</NavLink>
               </>
             )}

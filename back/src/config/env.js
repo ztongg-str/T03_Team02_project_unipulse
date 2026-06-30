@@ -24,6 +24,8 @@ const env = {
     secret: process.env.JWT_SECRET || 'unipulse_jwt_secret_key_2024',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
+  emailUser: process.env.EMAIL_USER || '',
+  emailPass: process.env.EMAIL_PASS || '',
   bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS, 10) || 10,
   nodeEnv: process.env.NODE_ENV || 'development',
 };

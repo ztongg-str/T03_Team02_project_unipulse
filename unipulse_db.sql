@@ -69,17 +69,6 @@ CREATE TABLE IF NOT EXISTS user_achievements (
   UNIQUE KEY unique_user_achievement (userId, achievementId)
 );
 
-CREATE TABLE IF NOT EXISTS streaks (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  userId INT NOT NULL UNIQUE,
-  currentStreak INT NOT NULL DEFAULT 0,
-  longestStreak INT NOT NULL DEFAULT 0,
-  lastActivity DATE DEFAULT NULL,
-  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS activity_logs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   userId INT NOT NULL,
@@ -290,10 +279,7 @@ INSERT INTO achievements (id, name, description, icon, criteria) VALUES
 (1, 'First Steps', 'Register for your first event', '/icons/first_steps.png', 'register_1_event'),
 (2, 'Social Butterfly', 'Add 5 friends on UniPulse', '/icons/social_butterfly.png', 'add_5_friends'),
 (3, 'Event Explorer', 'Attend 5 different events', '/icons/event_explorer.png', 'attend_5_events'),
-(4, 'Streak Starter', 'Maintain a 3-day activity streak', '/icons/streak_starter.png', 'streak_3_days'),
-(5, 'Streak Master', 'Maintain a 7-day activity streak', '/icons/streak_master.png', 'streak_7_days'),
-(6, 'Century Club', 'Maintain a 30-day activity streak', '/icons/century_club.png', 'streak_30_days'),
-(7, 'Event Organizer', 'Create your first event', '/icons/event_organizer.png', 'create_1_event'),
+(4, 'Event Organizer', 'Create your first event', '/icons/event_organizer.png', 'create_1_event'),
 (8, 'Crowd Pleaser', 'Organize an event with 100+ participants', '/icons/crowd_pleaser.png', 'event_100_participants'),
 (9, 'Tech Enthusiast', 'Attend 3 Tech category events', '/icons/tech_enthusiast.png', 'attend_3_tech_events'),
 (10, 'Sports Fanatic', 'Attend 3 Sports category events', '/icons/sports_fanatic.png', 'attend_3_sports_events'),
@@ -311,8 +297,7 @@ INSERT INTO achievements (id, name, description, icon, criteria) VALUES
 (22, 'Founding Member', 'Joined UniPulse in its first month', '/icons/founding_member.png', 'early_adopter'),
 (23, 'Profile Complete', 'Fill out your full profile with bio and avatar', '/icons/profile_complete.png', 'complete_profile'),
 (24, 'Report Responsible', 'Submit a verified report', '/icons/report_responsible.png', 'submit_verified_report'),
-(25, 'Streak Legend', 'Maintain a 100-day activity streak', '/icons/streak_legend.png', 'streak_100_days'),
-(26, 'Event Veteran', 'Attend 20 events total', '/icons/event_veteran.png', 'attend_20_events'),
+(25, 'Event Veteran', 'Attend 20 events total', '/icons/event_veteran.png', 'attend_20_events'),
 (27, 'Friendly Face', 'Add 20 friends on UniPulse', '/icons/friendly_face.png', 'add_20_friends'),
 (28, 'Top Organizer', 'Organize 10 approved events', '/icons/top_organizer.png', 'create_10_approved_events'),
 (29, 'Cultural Ambassador', 'Attend 10 Cultural category events', '/icons/cultural_ambassador.png', 'attend_10_cultural_events'),
@@ -324,8 +309,7 @@ INSERT INTO achievements (id, name, description, icon, criteria) VALUES
 (35, 'Perfect Attendance', 'Attend every event you registered for in a month', '/icons/perfect_attendance.png', 'perfect_attendance_month'),
 (36, 'Mentor', 'Help onboard 3 new students', '/icons/mentor.png', 'mentor_3_students'),
 (37, 'Big Spender Free', 'Register for 15 events in a semester', '/icons/big_spender.png', 'register_15_events_semester'),
-(38, 'Streak Saver', 'Recover a streak after missing one day', '/icons/streak_saver.png', 'streak_recovery'),
-(39, 'Graduation Ready', 'Attend the graduation send-off event', '/icons/graduation_ready.png', 'attend_graduation_event'),
+(38, 'Graduation Ready', 'Attend the graduation send-off event', '/icons/graduation_ready.png', 'attend_graduation_event'),
 (40, 'CADT Champion', 'Earn 10 different achievements', '/icons/cadt_champion.png', 'earn_10_achievements');
 
 -- User Achievements (40 rows)
@@ -371,55 +355,12 @@ INSERT INTO user_achievements (id, userId, achievementId, earnedAt) VALUES
 (39, 39, 33, '2026-02-18 10:00:00'),
 (40, 40, 40, '2026-02-19 10:00:00');
 
--- Streaks (40 rows, one per user)
-INSERT INTO streaks (id, userId, currentStreak, longestStreak, lastActivity) VALUES
-(1, 1, 3, 4, '2026-01-15'),
-(2, 2, 6, 8, '2026-01-20'),
-(3, 3, 9, 12, '2026-01-25'),
-(4, 4, 12, 16, '2026-01-30'),
-(5, 5, 15, 20, '2026-02-04'),
-(6, 6, 18, 24, '2026-02-09'),
-(7, 7, 21, 28, '2026-02-14'),
-(8, 8, 24, 32, '2026-02-19'),
-(9, 9, 27, 36, '2026-02-24'),
-(10, 10, 30, 40, '2026-03-01'),
-(11, 11, 2, 13, '2026-03-06'),
-(12, 12, 5, 17, '2026-03-11'),
-(13, 13, 8, 21, '2026-03-16'),
-(14, 14, 11, 25, '2026-03-21'),
-(15, 15, 14, 14, '2026-03-26'),
-(16, 16, 17, 18, '2026-03-31'),
-(17, 17, 20, 22, '2026-04-05'),
-(18, 18, 23, 26, '2026-04-10'),
-(19, 19, 26, 30, '2026-04-15'),
-(20, 20, 29, 34, '2026-04-20'),
-(21, 21, 1, 7, '2026-04-25'),
-(22, 22, 4, 11, '2026-04-30'),
-(23, 23, 7, 15, '2026-05-05'),
-(24, 24, 10, 19, '2026-05-10'),
-(25, 25, 13, 23, '2026-05-15'),
-(26, 26, 16, 27, '2026-05-20'),
-(27, 27, 19, 31, '2026-05-25'),
-(28, 28, 22, 35, '2026-05-30'),
-(29, 29, 25, 39, '2026-06-04'),
-(30, 30, 28, 28, '2026-06-09'),
-(31, 31, 0, 1, '2026-06-14'),
-(32, 32, 3, 5, '2026-06-19'),
-(33, 33, 6, 9, '2026-06-24'),
-(34, 34, 9, 13, '2026-06-29'),
-(35, 35, 12, 17, '2026-07-04'),
-(36, 36, 15, 21, '2026-07-09'),
-(37, 37, 18, 25, '2026-07-14'),
-(38, 38, 21, 29, '2026-07-19'),
-(39, 39, 24, 33, '2026-07-24'),
-(40, 40, 27, 37, '2026-07-29');
-
 -- Activity Logs (40 rows)
 INSERT INTO activity_logs (id, userId, action, details) VALUES
 (1, 2, 'event_register', 'User performed event register action on the UniPulse platform.'),
 (2, 4, 'event_unregister', 'User performed event unregister action on the UniPulse platform.'),
 (3, 6, 'achievement_earned', 'User performed achievement earned action on the UniPulse platform.'),
-(4, 8, 'streak_update', 'User performed streak update action on the UniPulse platform.'),
+(4, 8, 'event_view', 'User performed event view action on the UniPulse platform.'),
 (5, 10, 'event_create', 'User performed event create action on the UniPulse platform.'),
 (6, 12, 'profile_update', 'User performed profile update action on the UniPulse platform.'),
 (7, 14, 'friend_add', 'User performed friend add action on the UniPulse platform.'),
@@ -429,7 +370,7 @@ INSERT INTO activity_logs (id, userId, action, details) VALUES
 (11, 22, 'event_register', 'User performed event register action on the UniPulse platform.'),
 (12, 24, 'event_unregister', 'User performed event unregister action on the UniPulse platform.'),
 (13, 26, 'achievement_earned', 'User performed achievement earned action on the UniPulse platform.'),
-(14, 28, 'streak_update', 'User performed streak update action on the UniPulse platform.'),
+(14, 28, 'event_view', 'User performed event view action on the UniPulse platform.'),
 (15, 30, 'event_create', 'User performed event create action on the UniPulse platform.'),
 (16, 32, 'profile_update', 'User performed profile update action on the UniPulse platform.'),
 (17, 34, 'friend_add', 'User performed friend add action on the UniPulse platform.'),
@@ -439,7 +380,7 @@ INSERT INTO activity_logs (id, userId, action, details) VALUES
 (21, 2, 'event_register', 'User performed event register action on the UniPulse platform.'),
 (22, 4, 'event_unregister', 'User performed event unregister action on the UniPulse platform.'),
 (23, 6, 'achievement_earned', 'User performed achievement earned action on the UniPulse platform.'),
-(24, 8, 'streak_update', 'User performed streak update action on the UniPulse platform.'),
+(24, 8, 'event_view', 'User performed event view action on the UniPulse platform.'),
 (25, 10, 'event_create', 'User performed event create action on the UniPulse platform.'),
 (26, 12, 'profile_update', 'User performed profile update action on the UniPulse platform.'),
 (27, 14, 'friend_add', 'User performed friend add action on the UniPulse platform.'),
@@ -449,7 +390,7 @@ INSERT INTO activity_logs (id, userId, action, details) VALUES
 (31, 22, 'event_register', 'User performed event register action on the UniPulse platform.'),
 (32, 24, 'event_unregister', 'User performed event unregister action on the UniPulse platform.'),
 (33, 26, 'achievement_earned', 'User performed achievement earned action on the UniPulse platform.'),
-(34, 28, 'streak_update', 'User performed streak update action on the UniPulse platform.'),
+(34, 28, 'event_view', 'User performed event view action on the UniPulse platform.'),
 (35, 30, 'event_create', 'User performed event create action on the UniPulse platform.'),
 (36, 32, 'profile_update', 'User performed profile update action on the UniPulse platform.'),
 (37, 34, 'friend_add', 'User performed friend add action on the UniPulse platform.'),

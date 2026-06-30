@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import AppLayout from "./components/layout/AppLayout";
@@ -18,6 +18,7 @@ import ActivityLog from "./components/pages/ActivityLog";
 import StudentHome from "./components/pages/StudentHome";
 import About from "./components/pages/About";
 import History from "./components/pages/History";
+import Upcoming from "./components/pages/Upcoming";
 import OrganizerDashboard from "./components/pages/OrganizerDashboard";
 import CreateEvent from "./components/pages/CreateEvent";
 import EditEvent from "./components/pages/EditEvent";
@@ -50,8 +51,6 @@ function HomeRedirect() {
           navigate("/events", { replace: true });
         })
         .catch(() => navigate("/events", { replace: true }));
-    } else if (user.role === "organizer") {
-      // already handled above
     } else {
       // student — show StudentHome below, no redirect
     }
@@ -65,7 +64,8 @@ function HomeRedirect() {
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+  const location = useLocation();
+  if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   return children;
 }
 
@@ -120,6 +120,7 @@ function App() {
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/activity" element={<ActivityLog />} />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+            <Route path="/upcoming" element={<ProtectedRoute><Upcoming /></ProtectedRoute>} />
             <Route path="/about" element={<About />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

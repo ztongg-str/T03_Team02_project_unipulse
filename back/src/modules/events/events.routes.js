@@ -22,8 +22,6 @@ router.get('/upcoming', authenticate, eventsController.getUpcomingEvents);
 router.get('/my', authenticate, authorize('organizer', 'student'), eventsController.getMyEvents);
 router.get('/:id', eventsController.getEventById);
 router.post('/', authenticate, authorize('organizer', 'student'), validate(createEventSchema), eventsController.createEvent);
-router.post('/draft', authenticate, authorize('organizer', 'student'), eventsController.saveDraft);
-router.patch('/:id/publish', authenticate, authorize('organizer', 'student'), eventsController.publishEvent);
 router.put('/:id', authenticate, authorize('organizer', 'admin'), eventsController.updateEvent);
 router.delete('/:id', authenticate, authorize('organizer', 'admin'), eventsController.deleteEvent);
 

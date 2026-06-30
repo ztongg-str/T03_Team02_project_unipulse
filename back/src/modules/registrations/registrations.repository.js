@@ -42,10 +42,6 @@ export const removeByUserAndEvent = async (userId, eventId) => {
   await pool.query('DELETE FROM registrations WHERE userId = ? AND eventId = ?', [userId, eventId]);
 };
 
-export const removeByUserAndEvent = async (userId, eventId) => {
-  await pool.query('DELETE FROM registrations WHERE userId = ? AND eventId = ?', [userId, eventId]);
-};
-
 export const findByUser = async (userId) => {
   const [rows] = await pool.query(
     `SELECT r.*, e.title as eventTitle, e.date, e.location, e.category

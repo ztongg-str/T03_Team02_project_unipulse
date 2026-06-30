@@ -93,10 +93,20 @@ export const countAttended = async (userId) => {
 
 export const countFriends = async (userId) => {
   const [rows] = await pool.query(
-    'SELECT COUNT(*) as count FROM friends WHERE userId = ?',
-    [userId]
+    'SELECT COUNT(*) as count FROM friends WHERE userId = ? OR friendId = ?',
+    [userId, userId]
   );
   return rows[0].count;
+};
+
+export const _getUserLevel = async (userId) => {
+  const [rows] = await pool.query('SELECT level FROM users WHERE id = ?', [userId]);
+  return rows[0] || null;
+};
+
+export const _getUserProfile = async (userId) => {
+  const [rows] = await pool.query('SELECT bio, fullName FROM users WHERE id = ?', [userId]);
+  return rows[0] || null;
 };
 
 export const getDistinctCategories = async (userId) => {

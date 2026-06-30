@@ -184,7 +184,7 @@ export default function Profile() {
             <div className="profile-level-value">Lv.{user?.level || 1}</div>
             <div className="profile-xp-bar-wrapper">
               <div className="profile-xp-bar">
-                <div className="profile-xp-bar-fill" style={{ width: `${user?.xp ? (user.xp / ((user.level || 1) * 100)) * 100 : 0}%` }} />
+                <div className="profile-xp-bar-fill" style={{ width: `${user?.xp ? ((user.xp % ((user.level || 1) * 100)) / ((user.level || 1) * 100)) * 100 : 0}%` }} />
               </div>
               <div className="profile-xp-label">{user?.xp || 0} / {(user?.level || 1) * 100} XP</div>
             </div>
@@ -236,7 +236,7 @@ export default function Profile() {
         {/* Stats */}
         <div className="profile-stats-grid">
           <div className="profile-stat">
-            <div className="profile-stat-value">{upcomingEvents.length + 5}</div>
+            <div className="profile-stat-value">{upcomingEvents.length}</div>
             <div className="profile-stat-label">Events Attended</div>
           </div>
           <div className="profile-stat">

@@ -8,7 +8,7 @@ const { backupsDir } = backupRepository;
 
 const ALL_TABLES = [
   'users', 'events', 'registrations', 'friends', 'achievements',
-  'user_achievements', 'streaks', 'activity_logs', 'reports',
+  'user_achievements', 'activity_logs', 'reports',
   'upcoming_events', 'past_event_history', 'saved_events',
 ];
 

@@ -39,6 +39,7 @@ export default function EventDetail() {
     } catch {}
   };
 
+
   const toggleSave = async () => {
     if (!user) return;
     try {

@@ -12,7 +12,7 @@ export const findByUsername = async (username) => {
 
 export const findById = async (id) => {
   const [rows] = await pool.query(
-    'SELECT id, username, email, fullName, role, avatar, cover_image, xp, level, createdAt FROM users WHERE id = ?',
+    'SELECT id, username, email, fullName, role, avatar, cover_image, createdAt FROM users WHERE id = ?',
     [id]
   );
   return rows[0] || null;

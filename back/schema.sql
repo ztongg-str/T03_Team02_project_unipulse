@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS events (
   maxParticipants INT NOT NULL DEFAULT 100,
   image VARCHAR(255) DEFAULT NULL,
   status ENUM('draft', 'pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+  status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
   rejectionReason VARCHAR(500) DEFAULT NULL,
   organizerId INT NOT NULL,
   verifiedBy INT DEFAULT NULL,
@@ -76,7 +77,6 @@ CREATE TABLE IF NOT EXISTS user_achievements (
   FOREIGN KEY (achievementId) REFERENCES achievements(id) ON DELETE CASCADE,
   UNIQUE KEY unique_user_achievement (userId, achievementId)
 );
-
 
 
 CREATE TABLE IF NOT EXISTS activity_logs (

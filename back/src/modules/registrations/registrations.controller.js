@@ -30,24 +30,6 @@ export const cancelRegistrationByEvent = async (req, res, next) => {
 
 export const checkRegistration = async (req, res, next) => {
   try {
-    const registered = await registrationsService.checkRegistration(req.user.id, req.params.eventId);
-    return success(res, { registered });
-  } catch (err) {
-    return error(res, err.message, err.statusCode || 500);
-  }
-};
-
-export const cancelRegistrationByEvent = async (req, res, next) => {
-  try {
-    await registrationsService.cancelRegistrationByEvent(req.params.eventId, req.user);
-    return success(res, null, 'Registration cancelled successfully');
-  } catch (err) {
-    return error(res, err.message, err.statusCode || 400);
-  }
-};
-
-export const checkRegistration = async (req, res, next) => {
-  try {
     const result = await registrationsService.checkRegistration(req.params.eventId, req.user.id);
     return success(res, result);
   } catch (err) {

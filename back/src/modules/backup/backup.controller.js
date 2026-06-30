@@ -1,3 +1,4 @@
+import fs from 'fs';
 import * as backupService from './backup.service.js';
 import { success, created, error } from '../../utils/response.js';
 
@@ -79,6 +80,9 @@ export const getBackups = async (req, res, next) => {
 export const downloadBackup = async (req, res, next) => {
   try {
     const filepath = backupService.getBackupFilePath(req.params.filename);
+    if (!fs.existsSync(filepath)) {
+      return error(res, 'File not found', 404);
+    }
     res.download(filepath, req.params.filename);
   } catch (err) {
     return error(res, err.message, err.statusCode || 500);
