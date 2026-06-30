@@ -1,63 +1,31 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-export default function Register() {
-  const { otpRegister, verifyOTP, resendOTP } = useAuth();
+export default function ForgotPassword() {
+  const { forgotPassword, resetPassword } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    fullName: "",
-    password: "",
-    role: "student",
-  });
+  const [email, setEmail] = useState(location.state?.email || "");
   const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleRegister = async (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (!form.fullName || !form.email || !form.password || !form.username) {
-      setError("Please fill in all required fields");
-      return;
-    }
-
     setLoading(true);
     try {
-      await otpRegister({
-        username: form.username,
-        email: form.email,
-        fullName: form.fullName,
-        password: form.password,
-      });
-      setSuccess("Registration successful! Please check your email for the OTP code.");
+      await forgotPassword({ email });
+      setSuccess("OTP sent to your email. Please check your inbox.");
       setStep(2);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const user = await verifyOTP({ email: form.email, otp });
-      navigate(user.role === "organizer" ? "/organizer/dashboard" : "/events");
-    } catch (err) {
-      setError(err.response?.data?.message || "Verification failed. Please try again.");
+      setError(err.response?.data?.message || "Failed to send OTP. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -67,12 +35,40 @@ export default function Register() {
     setError("");
     setResendDisabled(true);
     try {
-      await resendOTP({ email: form.email });
+      await forgotPassword({ email });
       setSuccess("OTP resent successfully.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to resend OTP.");
     } finally {
       setTimeout(() => setResendDisabled(false), 30000);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await resetPassword({ email, otp, password });
+      navigate("/login", {
+        state: { successMessage: "Password reset successfully. Please sign in with your new password." },
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to reset password. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,10 +83,10 @@ export default function Register() {
             </svg>
             <span>UniPulse</span>
           </div>
-          <h1 className="auth-brand-heading">Join your campus rhythm.</h1>
+          <h1 className="auth-brand-heading">Reset your password.</h1>
           <p className="auth-brand-desc">
-            Create your account and start exploring workshops, festivals, and
-            events happening around your university.
+            Enter your email and we'll send you a one-time code to reset your
+            password and get back on campus.
           </p>
           <div className="auth-brand-card">
             <div className="auth-brand-avatars">
@@ -110,31 +106,15 @@ export default function Register() {
         <div className="auth-form-inner">
           {step === 1 ? (
             <>
-              <h2 className="auth-form-title">Create Account</h2>
-              <p className="auth-form-subtitle">Get started with your campus-wide experience.</p>
+              <h2 className="auth-form-title">Forgot Password</h2>
+              <p className="auth-form-subtitle">
+                Enter your email address and we'll send you a code to reset your password.
+              </p>
 
               {error && <div className="alert alert-error">{error}</div>}
               {success && <div className="alert alert-success">{success}</div>}
 
-              <form onSubmit={handleRegister}>
-                <div className="auth-input-group">
-                  <label>Full Name</label>
-                  <div className="auth-input-wrapper">
-                    <svg className="auth-input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="7" r="4" stroke="#85736B" strokeWidth="2"/>
-                      <path d="M3 18c0-4 3-7 7-7s7 3 7 7" stroke="#85736B" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    <input
-                      name="fullName"
-                      type="text"
-                      placeholder="e.g. Juan dela Cruz"
-                      value={form.fullName}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-
+              <form onSubmit={handleSendOtp}>
                 <div className="auth-input-group">
                   <label>University Email</label>
                   <div className="auth-input-wrapper">
@@ -146,53 +126,15 @@ export default function Register() {
                       name="email"
                       type="email"
                       placeholder="e.g. juan@university.edu"
-                      value={form.email}
-                      onChange={handleChange}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
                 </div>
 
-                <div className="auth-input-group">
-                  <label>Student ID</label>
-                  <div className="auth-input-wrapper">
-                    <svg className="auth-input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <rect x="4" y="2" width="12" height="16" rx="2" stroke="#85736B" strokeWidth="2"/>
-                      <path d="M8 8h4M8 11h4" stroke="#85736B" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    <input
-                      name="username"
-                      type="text"
-                      placeholder="e.g. 2024-00001"
-                      value={form.username}
-                      onChange={handleChange}
-                      required
-                      minLength={3}
-                    />
-                  </div>
-                </div>
-
-                <div className="auth-input-group">
-                  <label>Password</label>
-                  <div className="auth-input-wrapper">
-                    <svg className="auth-input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <rect x="4" y="9" width="12" height="9" rx="2" stroke="#85736B" strokeWidth="2"/>
-                      <path d="M7 9V6a3 3 0 016 0v3" stroke="#85736B" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    <input
-                      name="password"
-                      type="password"
-                      placeholder="Min. 6 characters"
-                      value={form.password}
-                      onChange={handleChange}
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-
-                <button type="submit" className="auth-submit-btn" disabled={loading}>
-                  {loading ? "Creating Account..." : "Create My Account"}
+                <button type="submit" className="auth-submit-btn" disabled={loading || !email}>
+                  {loading ? "Sending..." : "Send Code"}
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -200,20 +142,20 @@ export default function Register() {
               </form>
 
               <p className="auth-form-footer">
-                Already have an account? <Link to="/login">Sign In</Link>
+                <Link to="/login">Back to Login</Link>
               </p>
             </>
           ) : (
             <>
-              <h2 className="auth-form-title">Verify Your Email</h2>
+              <h2 className="auth-form-title">Enter Code</h2>
               <p className="auth-form-subtitle">
-                Enter the 6-digit code sent to <strong>{form.email}</strong>
+                Enter the 6-digit code sent to <strong>{email}</strong>
               </p>
 
               {error && <div className="alert alert-error">{error}</div>}
               {success && <div className="alert alert-success">{success}</div>}
 
-              <form onSubmit={handleVerifyOtp}>
+              <form onSubmit={handleResetPassword}>
                 <div className="auth-input-group">
                   <label>OTP Code</label>
                   <div className="auth-input-wrapper">
@@ -233,8 +175,46 @@ export default function Register() {
                   </div>
                 </div>
 
-                <button type="submit" className="auth-submit-btn" disabled={loading || otp.length !== 6}>
-                  {loading ? "Verifying..." : "Verify & Continue"}
+                <div className="auth-input-group">
+                  <label>New Password</label>
+                  <div className="auth-input-wrapper">
+                    <svg className="auth-input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <rect x="4" y="9" width="12" height="9" rx="2" stroke="#85736B" strokeWidth="2"/>
+                      <path d="M7 9V6a3 3 0 016 0v3" stroke="#85736B" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    <input
+                      name="password"
+                      type="password"
+                      placeholder="Min. 6 characters"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+
+                <div className="auth-input-group">
+                  <label>Confirm New Password</label>
+                  <div className="auth-input-wrapper">
+                    <svg className="auth-input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <rect x="4" y="9" width="12" height="9" rx="2" stroke="#85736B" strokeWidth="2"/>
+                      <path d="M7 9V6a3 3 0 016 0v3" stroke="#85736B" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    <input
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="Repeat your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" className="auth-submit-btn" disabled={loading || !otp || !password}>
+                  {loading ? "Resetting..." : "Reset Password"}
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>

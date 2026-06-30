@@ -344,7 +344,7 @@ export default function MyEvents() {
 
                   <div className="org-myevents-card-actions">
                     <Link
-                      to={`/events/${ev.id || ev._id}`}
+                      to={`/organizer/my-events/${ev.id || ev._id}/registrations`}
                       className="org-action-btn"
                       title="View"
                     >

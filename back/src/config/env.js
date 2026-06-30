@@ -5,7 +5,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config({ path: join(__dirname, '../../.env') });
+dotenv.config({ path: join(__dirname, '../../.env'), override: true });
 
 const env = {
   port: parseInt(process.env.PORT, 10) || 4000,
@@ -26,6 +26,12 @@ const env = {
   },
   bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS, 10) || 10,
   nodeEnv: process.env.NODE_ENV || 'development',
+  email: {
+    user: process.env.EMAIL_USER || process.env.USER || '',
+    pass: process.env.EMAIL_PASS || process.env.OPT_PW || '',
+  },
+  emailUser: process.env.EMAIL_USER || process.env.USER || '',
+  emailPass: process.env.EMAIL_PASS || process.env.OPT_PW || '',
 };
 
 export default env;

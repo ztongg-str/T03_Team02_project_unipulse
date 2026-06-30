@@ -30,6 +30,14 @@ export const authAPI = {
   login: (data) => api.post("/auth/login", data).then((r) => r.data),
   me: () => api.get("/auth/me").then((r) => r.data),
   switchRole: () => api.post("/auth/switch-role").then((r) => r.data),
+  forgotPassword: (data) => api.post("/otp/forgot-password", data).then((r) => r.data),
+  resetPassword: (data) => api.post("/otp/reset-password", data).then((r) => r.data),
+};
+
+export const otpAPI = {
+  register: (data) => api.post("/otp/register", data).then((r) => r.data),
+  verifyOTP: (data) => api.post("/otp/verify-otp", data).then((r) => r.data),
+  resendOTP: (data) => api.post("/otp/resend-otp", data).then((r) => r.data),
 };
 
 export const usersAPI = {

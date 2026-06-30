@@ -9,6 +9,7 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const successMessage = location.state?.successMessage || "";
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -68,6 +69,7 @@ export default function Login() {
           <h2 className="auth-form-title">Welcome Back</h2>
           <p className="auth-form-subtitle">Sign in to your campus-wide experience.</p>
 
+          {successMessage && <div className="alert alert-success">{successMessage}</div>}
           {error && <div className="alert alert-error">{error}</div>}
 
           <form onSubmit={handleSubmit}>
@@ -105,6 +107,10 @@ export default function Login() {
                   required
                 />
               </div>
+            </div>
+
+            <div className="auth-forgot-row">
+              <Link to="/forgot-password" className="auth-forgot-link">Forgot password?</Link>
             </div>
 
             <button type="submit" className="auth-submit-btn" disabled={loading}>

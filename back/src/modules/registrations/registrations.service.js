@@ -14,6 +14,11 @@ export const registerForEvent = async (userId, eventId) => {
     err.statusCode = 400;
     throw err;
   }
+  if (new Date(event.date) < new Date()) {
+    const err = new Error('Cannot register for an event that has already ended');
+    err.statusCode = 400;
+    throw err;
+  }
   const existing = await registrationsRepository.findByUserAndEvent(userId, eventId);
   if (existing) {
     const err = new Error('Already registered for this event');
@@ -60,7 +65,7 @@ export const getEventRegistrations = async (eventId, user) => {
     err.statusCode = 404;
     throw err;
   }
-  if (event.organizerId !== user.id) {
+  if (event.organizerId !== user.id && user.role !== 'admin') {
     const err = new Error('Not authorized to view these registrations');
     err.statusCode = 403;
     throw err;

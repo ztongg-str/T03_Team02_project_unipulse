@@ -154,11 +154,6 @@ export default function OrganizerDashboard() {
                               <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="2"/>
                             </svg>
                           </Link>
-                          <Link to={`/organizer/edit-event/${ev.id}`} className="org-action-btn" title="Edit">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M11.5 2.5l2 2L7 11H5V9l6.5-6.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </Link>
                         </div>
                       </td>
                     </tr>

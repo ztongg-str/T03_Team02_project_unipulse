@@ -29,3 +29,11 @@ export const createUser = async ({ username, email, password, fullName}) => {
 export const updateRole = async (id, role) => {
   await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
 };
+
+export const updateUserOtp = async (email, otp, otpExpiresAt) => {
+  await pool.query('UPDATE users SET otp = ?, otpExpiresAt = ? WHERE email = ?', [otp, otpExpiresAt, email]);
+};
+
+export const updateUserPassword = async (email, hashedPassword) => {
+  await pool.query('UPDATE users SET password = ?, otp = NULL, otpExpiresAt = NULL WHERE email = ?', [hashedPassword, email]);
+};

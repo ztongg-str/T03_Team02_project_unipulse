@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { eventsAPI } from "../../services/api";
+import LocationPicker from "../LocationPicker";
 
 const categories = [
   "workshop", "festival", "sports", "academic",
@@ -168,20 +169,13 @@ export default function CreateEvent() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                Location
-              </label>
-              <input
-                type="text"
-                name="location"
+              <LocationPicker
                 value={form.location}
-                onChange={handleChange}
-                placeholder="Event location"
-                className={inputClass("location")}
+                onChange={(val) =>
+                  setForm((prev) => ({ ...prev, location: val }))
+                }
+                error={errors.location}
               />
-              {errors.location && (
-                <p className="mt-1 text-xs text-red-500">{errors.location}</p>
-              )}
             </div>
 
             <div>

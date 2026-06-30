@@ -86,6 +86,8 @@ export default function EventDetail() {
     });
   };
 
+  const isExpired = event && new Date(event.date) < new Date();
+
   if (loading) return <div className="loading">Loading event...</div>;
   if (!event) return null;
 
@@ -132,7 +134,11 @@ export default function EventDetail() {
         )}
 
         <div className="event-detail-actions">
-          {user ? (
+          {isExpired ? (
+            <button className="btn btn-outlined" disabled>
+              Event has ended
+            </button>
+          ) : user ? (
             <button
               className="btn btn-primary"
               onClick={handleRegister}

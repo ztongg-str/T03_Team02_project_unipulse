@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { authAPI } from "../services/api";
+import { authAPI, otpAPI } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
       return stored && stored !== 'undefined' ? JSON.parse(stored) : null;
     } catch (e) {
       console.error("Failed to parse user from localStorage:", e);
-      localStorage.removeItem("user"); // Clear corrupted data
+      localStorage.removeItem("user");
       return null;
     }
   });
@@ -56,6 +56,34 @@ export function AuthProvider({ children }) {
     return res.data.user;
   }, []);
 
+  const forgotPassword = useCallback(async (data) => {
+    const res = await authAPI.forgotPassword(data);
+    return res.data;
+  }, []);
+
+  const resetPassword = useCallback(async (data) => {
+    const res = await authAPI.resetPassword(data);
+    return res.data;
+  }, []);
+
+  const otpRegister = useCallback(async (data) => {
+    const res = await otpAPI.register(data);
+    return res.data;
+  }, []);
+
+  const verifyOTP = useCallback(async (data) => {
+    const res = await otpAPI.verifyOTP(data);
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+    setUser(res.data.user);
+    return res.data.user;
+  }, []);
+
+  const resendOTP = useCallback(async (data) => {
+    const res = await otpAPI.resendOTP(data);
+    return res.data;
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -68,7 +96,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, forgotPassword, resetPassword, otpRegister, verifyOTP, resendOTP, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

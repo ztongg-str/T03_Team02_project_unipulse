@@ -8,6 +8,6 @@ const router = Router();
 router.post('/', authenticate, registrationsController.registerForEvent);
 router.delete('/:id', authenticate, registrationsController.cancelRegistration);
 router.get('/my', authenticate, registrationsController.getMyRegistrations);
-router.get('/event/:eventId', authenticate, authorize('organizer'), registrationsController.getEventRegistrations);
+router.get('/event/:eventId', authenticate, registrationsController.getEventRegistrations);
 
 export default router;

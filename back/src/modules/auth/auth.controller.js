@@ -36,3 +36,21 @@ export const switchRole = async (req, res, next) => {
     return error(res, err.message, err.statusCode || 400);
   }
 };
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const result = await authService.forgotPassword(req.body);
+    return success(res, result, 'OTP sent to your email');
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 404);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const result = await authService.resetPassword(req.body);
+    return success(res, result, 'Password reset successfully');
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 400);
+  }
+};

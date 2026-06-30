@@ -6,6 +6,7 @@ import Landing from "./components/pages/Landing";
 import { authAPI } from "./services/api";
 import Login from "./components/pages/Login";
 import Register from "./components/pages/Register";
+import ForgotPassword from "./components/pages/ForgotPassword";
 import Events from "./components/pages/Events";
 import EventDetail from "./components/pages/EventDetail";
 import MyRegistrations from "./components/pages/MyRegistrations";
@@ -110,6 +111,7 @@ function App() {
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/events" element={<Events />} />
             <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />

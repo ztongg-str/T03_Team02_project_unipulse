@@ -2406,6 +2406,23 @@ input, textarea, select { font-family: inherit; outline: none; }
   text-decoration: underline;
 }
 
+.auth-forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -8px 0 8px;
+}
+
+.auth-forgot-link {
+  font-size: 13px;
+  color: var(--color-orange);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-forgot-link:hover {
+  text-decoration: underline;
+}
+
 /* ======== ORGANIZER LAYOUT ======== */
 .org-layout {
   display: flex;

@@ -8,7 +8,6 @@ export const getUpcomingEvents = async (userId) => {
 };
 
 export const getPastHistory = async (userId) => {
-  await historyRepository.expireUserUpcomingEvents(userId);
   return historyRepository.findPastByUser(userId);
 };
 

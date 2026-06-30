@@ -7,6 +7,7 @@ export default function History() {
   const [past, setPast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [showAllPast, setShowAllPast] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -58,6 +59,8 @@ export default function History() {
       : filter === "attended"
         ? past.filter((e) => e.attended)
         : past.filter((e) => !e.attended);
+
+  const displayedPast = showAllPast ? filteredPast : filteredPast.slice(0, 3);
 
   const mainUpcoming = upcoming[0] || null;
   const sideUpcoming = upcoming.slice(1, 3);
@@ -211,7 +214,11 @@ export default function History() {
       <section className="history-section">
         <div className="history-section-header with-border">
           <div className="history-section-heading">
-            <svg width="24" height="28" viewBox="0 0 24 28" fill="none">
+            <svg
+              width="24" height="28" viewBox="0 0 24 28" fill="none"
+              onClick={() => setShowAllPast(!showAllPast)}
+              style={{ cursor: "pointer" }}
+            >
               <path d="M4 10L12 18L20 10" stroke="#85736E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <h2>Past Events</h2>
@@ -240,7 +247,7 @@ export default function History() {
           </div>
         ) : (
           <div className="history-past-list">
-            {filteredPast.map((ev) => {
+            {displayedPast.map((ev) => {
               const isAttended = ev.attended || ev.status === "attended";
               const isExpired = ev.status === "expired";
               const isMissed = ev.status === "missed" || (!isAttended && ev.status !== "refunded" && !isExpired);
@@ -324,9 +331,11 @@ export default function History() {
           </div>
         )}
 
-        {filteredPast.length > 0 && filteredPast.length >= 3 && (
+        {filteredPast.length > 3 && (
           <div className="history-load-more">
-            <button className="hpl-load-btn">Load More</button>
+            <button className="hpl-load-btn" onClick={() => setShowAllPast(!showAllPast)}>
+              {showAllPast ? "Show Less" : `View All (${filteredPast.length})`}
+            </button>
           </div>
         )}
       </section>
