@@ -1,0 +1,35 @@
+import { Router } from 'express';
+import * as eventsController from './events.controller.js';
+import { authenticate, optionalAuth } from '../../middlewares/authMiddleware.js';
+import { authorize } from '../../middlewares/roleMiddleware.js';
+import { validate, required, minLength } from '../../middlewares/validationMiddleware.js';
+
+const router = Router();
+
+const createEventSchema = {
+  body: {
+    title: [required, minLength(3)],
+    description: [required, minLength(10)],
+    date: [required],
+    location: [required],
+    category: [required],
+    maxParticipants: [required],
+  },
+};
+
+router.get('/', optionalAuth, eventsController.getAllEvents);
+router.get('/upcoming', authenticate, eventsController.getUpcomingEvents);
+router.get('/my', authenticate, authorize('organizer', 'student'), eventsController.getMyEvents);
+router.get('/:id', eventsController.getEventById);
+router.post('/', authenticate, authorize('organizer', 'student'), validate(createEventSchema), eventsController.createEvent);
+router.post('/draft', authenticate, authorize('organizer', 'student'), eventsController.saveDraft);
+router.patch('/:id/publish', authenticate, authorize('organizer', 'student'), eventsController.publishEvent);
+router.put('/:id', authenticate, authorize('organizer', 'admin'), eventsController.updateEvent);
+router.delete('/:id', authenticate, authorize('organizer', 'admin'), eventsController.deleteEvent);
+
+// Event Verification — admin only. Organizers can no longer self-approve;
+// every new event sits in 'pending' until an admin reviews it.
+router.patch('/:id/approve', authenticate, authorize('admin'), eventsController.approveEvent);
+router.patch('/:id/reject', authenticate, authorize('admin'), eventsController.rejectEvent);
+
+export default router;
