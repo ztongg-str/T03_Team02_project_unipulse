@@ -29,7 +29,7 @@ export const register = async ({ username, email, password, fullName }) => {
 
   return {
     token,
-    user: { id: userId, username, email, fullName, role: 'student' },
+    user: { id: userId, username, email, fullName, role: 'student', avatar: null, bio: null, xp: 0, level: 1 },
   };
 };
 
@@ -58,6 +58,10 @@ export const login = async ({ email, password }) => {
       email: user.email,
       fullName: user.fullName,
       role: user.role,
+      avatar: user.avatar,
+      bio: user.bio,
+      xp: user.xp,
+      level: user.level,
     },
   };
 };
@@ -93,6 +97,10 @@ export const switchRole = async (userId) => {
       email: user.email,
       fullName: user.fullName,
       role: newRole,
+      avatar: user.avatar,
+      bio: user.bio,
+      xp: user.xp,
+      level: user.level,
     },
   };
 };

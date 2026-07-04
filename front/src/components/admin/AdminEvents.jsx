@@ -148,7 +148,7 @@ export default function AdminEvents() {
                     <tr key={ev.id} style={{ borderTop: "1px solid #F0F0F0" }} onMouseEnter={(e) => e.currentTarget.style.background = "#FAFAFA"} onMouseLeave={(e) => e.currentTarget.style.background = ""}>
                       <td style={{ padding: "14px 16px", maxWidth: 240 }}>
                         <div style={{ fontWeight: 600, fontSize: 14, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ev.title}</div>
-                        <div style={{ fontSize: 12, color: "#8A7A72", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ev.location}</div>
+                        <div style={{ fontSize: 12, color: "#8A7A72", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ev.location?.includes(",") ? <a href={`https://www.google.com/maps?q=${ev.location}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FF7A00", textDecoration: "underline" }}>{ev.location}</a> : ev.location}</div>
                         {ev.status === "rejected" && ev.rejectionReason && (
                           <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2, fontStyle: "italic" }} title={ev.rejectionReason}>
                             ↩ {ev.rejectionReason.length > 40 ? ev.rejectionReason.slice(0, 40) + "…" : ev.rejectionReason}

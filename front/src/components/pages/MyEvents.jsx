@@ -328,7 +328,7 @@ export default function MyEvents() {
                         strokeWidth="1.5"
                       />
                     </svg>
-                    <span>{ev.location || "No location set"}</span>
+                    <span>{ev.location ? <a href={`https://www.google.com/maps?q=${encodeURIComponent(ev.location)}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FF7A00", textDecoration: "underline" }}>{ev.location}</a> : "No location set"}</span>
                   </div>
 
                   {ev.maxParticipants && (

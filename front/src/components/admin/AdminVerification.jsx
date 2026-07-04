@@ -90,7 +90,7 @@ function EventCard({ event, onApproved, onRejected }) {
 
         {/* Details */}
         <div style={{ padding: "16px 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          <Detail icon="📍" label="Location" value={event.location} />
+          <Detail icon="📍" label="Location" value={event.location ? <a href={`https://www.google.com/maps?q=${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FF7A00", textDecoration: "underline" }}>{event.location}</a> : "—"} />
           <Detail icon="📅" label="Event Date" value={fmtDate(event.date)} />
           <Detail icon="👥" label="Max Participants" value={event.maxParticipants ? `${event.maxParticipants} people` : "—"} />
           {event.status !== "pending" && event.verifiedAt && (

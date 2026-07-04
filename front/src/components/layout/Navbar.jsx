@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { authAPI } from "../../services/api";
@@ -8,12 +8,30 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showFab, setShowFab] = useState(true);
+  const [lastScroll, setLastScroll] = useState(0);
 
   const handleLogout = () => {
     setShowLogoutModal(false);
     logout();
     setTimeout(() => navigate("/"), 0);
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const current = window.scrollY;
+      if (current < 10) {
+        setShowFab(true);
+      } else if (current > lastScroll) {
+        setShowFab(false);
+      } else {
+        setShowFab(true);
+      }
+      setLastScroll(current);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScroll]);
 
   const handleCreateEvent = async () => {
     try {
@@ -46,6 +64,7 @@ export default function Navbar() {
                 <NavLink to="/friends" className={navLinkClass} onClick={() => setMenuOpen(false)}>Community</NavLink>
                 <NavLink to="/upcoming" className={navLinkClass} onClick={() => setMenuOpen(false)}>Upcoming</NavLink>
                 <NavLink to="/history" className={navLinkClass} onClick={() => setMenuOpen(false)}>History</NavLink>
+                <NavLink to="/scan-qr" className={navLinkClass} onClick={() => setMenuOpen(false)}>Scan QR</NavLink>
               </>
             )}
             {!user && (
@@ -61,10 +80,10 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                <button onClick={handleCreateEvent} className="btn btn-primary btn-small hidden md:inline-flex">
+                <button onClick={handleCreateEvent} className="btn btn-primary btn-small nav-create-btn">
                   Create Event
                 </button>
-                <Link to="/profile" className="flex items-center gap-4">
+                <Link to="/profile" className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full border-2 border-orange bg-orange text-white flex items-center justify-center text-base font-bold overflow-hidden">
                     {user.avatar ? (
                       <img src={`http://localhost:4000${user.avatar}`} alt="" className="w-full h-full object-cover" />
@@ -108,6 +127,22 @@ export default function Navbar() {
             </div>
           </div>
         </div>
+      )}
+
+      {user && (
+        <button
+          onClick={handleCreateEvent}
+          className="create-event-fab"
+          style={{
+            transform: showFab ? "translateY(0)" : "translateY(100px)",
+            opacity: showFab ? 1 : 0,
+          }}
+          aria-label="Create Event"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M12 4v16M4 12h16" />
+          </svg>
+        </button>
       )}
     </>
   );

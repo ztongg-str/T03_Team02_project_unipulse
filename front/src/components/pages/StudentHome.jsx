@@ -135,7 +135,7 @@ export default function StudentHome() {
                     {ev.category}
                   </div>
                   <h3 className="sh-upcoming-title">{ev.title}</h3>
-                  <p className="sh-upcoming-meta">{formatDate(ev.date)} &middot; {ev.location}</p>
+                  <p className="sh-upcoming-meta">{formatDate(ev.date)} &middot; {ev.location ? <a href={`https://www.google.com/maps?q=${encodeURIComponent(ev.location)}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FF7A00", textDecoration: "underline" }}>{ev.location}</a> : ev.location}</p>
                 </div>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M7 4L13 10L7 16" stroke="#FF7A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

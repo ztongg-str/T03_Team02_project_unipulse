@@ -30,6 +30,7 @@ export const registerForEvent = async (userId, eventId) => {
 
   await checkAndGrant(userId, 'register_1_event');
   await checkAndGrant(userId, 'explore_3_categories');
+  await checkAndGrant(userId, 'book_5_events');
 
   return registrationsRepository.findById(regId);
 };

@@ -25,6 +25,9 @@ import CreateEvent from "./components/pages/CreateEvent";
 import EditEvent from "./components/pages/EditEvent";
 import OrganizerLayout from "./components/layout/OrganizerLayout";
 import MyEvents from "./components/pages/MyEvents";
+import QRCheckIn from "./components/pages/QRCheckIn";
+import UserHistory from "./components/pages/UserHistory";
+import ScanQR from "./components/pages/ScanQR";
 
 // Admin
 import AdminDashboard from "./components/admin/AdminDashboard";
@@ -109,6 +112,7 @@ function App() {
             <Route path="edit-event/:id" element={<EditEvent />} />
             <Route path="reports" element={<Events />} />
             <Route path="settings" element={<Profile />} />
+            <Route path="qr-checkin" element={<QRCheckIn />} />
           </Route>
 
           {/* ── Student / Public ── */}
@@ -125,7 +129,8 @@ function App() {
             <Route path="/friends/profile/:userId" element={<ProtectedRoute><FriendProfile /></ProtectedRoute>} />
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/activity" element={<ActivityLog />} />
-            <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute><UserHistory /></ProtectedRoute>} />
+            <Route path="/scan-qr" element={<ProtectedRoute><ScanQR /></ProtectedRoute>} />
             <Route path="/upcoming" element={<ProtectedRoute><Upcoming /></ProtectedRoute>} />
             <Route path="/about" element={<About />} />
             <Route path="*" element={<Navigate to="/" replace />} />

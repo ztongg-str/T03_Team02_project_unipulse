@@ -2,7 +2,7 @@ import pool from '../../config/database.js';
 
 export const findById = async (id) => {
   const [rows] = await pool.query(
-    'SELECT id, username, email, fullName, role, status, avatar, cover_image, bio, createdAt FROM users WHERE id = ?',
+    'SELECT id, username, email, fullName, role, status, avatar, cover_image, bio, xp, level, createdAt FROM users WHERE id = ?',
     [id]
   );
   return rows[0] || null;
@@ -45,7 +45,7 @@ export const findAll = async ({ page = 1, limit = 20, role, status, search }) =>
   }
 
   const [rows] = await pool.query(
-    `SELECT id, username, email, fullName, role, status, avatar, cover_image, createdAt
+    `SELECT id, username, email, fullName, role, status, avatar, cover_image, bio, xp, level, createdAt
      FROM users WHERE ${where} ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
     [...params, Number(limit), Number(offset)]
   );
@@ -72,6 +72,28 @@ export const countAdmins = async () => {
     "SELECT COUNT(*) as total FROM users WHERE role IN ('superadmin','developer','coordinator')"
   );
   return rows[0].total;
+};
+
+export const addXp = async (userId, amount) => {
+  const [rows] = await pool.query('SELECT xp, level FROM users WHERE id = ?', [userId]);
+  if (!rows[0]) {
+    const err = new Error('User not found');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  let { xp, level } = rows[0];
+  xp += amount;
+  let leveledUp = false;
+
+  while (xp >= level * 100) {
+    xp -= level * 100;
+    level++;
+    leveledUp = true;
+  }
+
+  await pool.query('UPDATE users SET xp = ?, level = ? WHERE id = ?', [xp, level, userId]);
+  return { leveledUp, newLevel: level, newXp: xp };
 };
 
 export const remove = async (id) => {

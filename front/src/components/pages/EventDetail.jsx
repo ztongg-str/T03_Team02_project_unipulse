@@ -115,9 +115,9 @@ export default function EventDetail() {
           <span>&#128197; {formatDate(event.date)}</span>
           <span>&#128338; {formatTime(event.date)}</span>
           <span>&#128205;{" "}
-            {event.location?.includes(",") ? (
+            {event.location ? (
               <a
-                href={`https://www.google.com/maps?q=${event.location}`}
+                href={`https://www.google.com/maps?q=${encodeURIComponent(event.location)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-orange-100 text-orange-700 text-sm font-semibold hover:bg-orange-200 transition"

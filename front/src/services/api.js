@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api";
+// const API_BASE_URL = "http://localhost:4000/api";
+
+const API_BASE_URL = "http://192.168.2.2:4000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -139,4 +141,10 @@ export const backupAPI = {
 export const queryConsoleAPI = {
   execute: (query) => api.post('/query-console/execute', { query }).then((r) => r.data),
   getLogs: (params) => api.get('/query-console/logs', { params }).then((r) => r.data),
+};
+
+export const attendanceAPI = {
+  checkIn: (eventId) => api.post('/attendance/checkin', { eventId }).then((r) => r.data),
+  checkInByCode: (code) => api.post('/attendance/checkin-by-code', { code }).then((r) => r.data),
+  getMyHistory: () => api.get('/attendance/my-history').then((r) => r.data),
 };

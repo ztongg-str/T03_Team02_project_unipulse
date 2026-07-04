@@ -71,11 +71,21 @@ export const findById = async (id) => {
   return rows[0] || null;
 };
 
+const generateCheckinCode = async () => {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const code = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+    const [existing] = await pool.query('SELECT id FROM events WHERE checkin_code = ?', [code]);
+    if (existing.length === 0) return code;
+  }
+  throw new Error('Could not generate unique check-in code');
+};
+
 export const create = async (data) => {
+  const checkinCode = await generateCheckinCode();
   const [result] = await pool.query(
-    `INSERT INTO events (title, description, date, location, category, maxParticipants, image, organizerId, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [data.title, data.description, data.date, data.location, data.category, data.maxParticipants, data.image || null, data.organizerId, data.status || 'pending']
+    `INSERT INTO events (title, description, date, location, category, maxParticipants, image, organizerId, status, checkin_code)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [data.title, data.description, data.date, data.location, data.category, data.maxParticipants, data.image || null, data.organizerId, data.status || 'pending', checkinCode]
   );
   return result.insertId;
 };

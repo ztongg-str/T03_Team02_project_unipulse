@@ -27,7 +27,7 @@ export default function OrganizerLayout() {
 
   return (
     <div className="org-layout">
-      <div className="org-sidebar-overlay" onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 99 }} />
+      <div className={`org-sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)} />
       <aside className={`org-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="org-sidebar-header">
           <div className="org-sidebar-logo">UniPulse</div>
@@ -59,12 +59,15 @@ export default function OrganizerLayout() {
             Create Event
           </NavLink>
 
-          <NavLink to="/profile" className={({ isActive }) => isActive ? "org-nav-item active" : "org-nav-item"}>
+          <NavLink to="/organizer/qr-checkin" className={({ isActive }) => isActive ? "org-nav-item active" : "org-nav-item"}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
-              <path d="M3 18c0-4 3-7 7-7s7 3 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <rect x="3" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
+              <rect x="12" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
+              <rect x="3" y="12" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
+              <rect x="12" y="12" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
+              <path d="M8 8h4v4H8z" stroke="currentColor" strokeWidth="1.5"/>
             </svg>
-            Profile
+            Event QR Codes
           </NavLink>
 
           <NavLink to="/organizer/settings" className={({ isActive }) => isActive ? "org-nav-item active" : "org-nav-item"}>
@@ -95,7 +98,7 @@ export default function OrganizerLayout() {
       <div className="org-main">
         <header className="org-topbar">
           <div className="org-topbar-actions">
-            <button className="org-mobile-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'none' }}>
+            <button className="org-mobile-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
               <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#584235" strokeWidth="2" strokeLinecap="round">
                 {sidebarOpen ? (
                   <><path d="M5 5l12 12M17 5l-12 12" /></>
@@ -109,7 +112,10 @@ export default function OrganizerLayout() {
               <div className="org-topbar-avatar">
                 {user?.fullName?.charAt(0) || user?.username?.charAt(0) || "O"}
               </div>
-              <span className="org-topbar-name">{user?.fullName || user?.username}</span>
+              <div>
+                <div className="org-topbar-name">{user?.fullName || user?.username}</div>
+                <div className="org-topbar-role">{user?.role}</div>
+              </div>
             </div>
           </div>
         </header>

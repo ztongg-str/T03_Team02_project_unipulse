@@ -253,7 +253,7 @@ export default function Events() {
                         <circle cx="9" cy="9" r="5" stroke="currentColor" strokeWidth="2" />
                         <path d="M9 18c-3-3-5-6-5-9s2-5 5-5 5 2 5 5-2 6-5 9z" stroke="currentColor" strokeWidth="2" />
                       </svg>
-                      <span>{event.location}</span>
+                      <span>{event.location ? <a href={`https://www.google.com/maps?q=${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FF7A00", textDecoration: "underline" }}>{event.location}</a> : event.location}</span>
                     </div>
 
                     <div className="event-card-footer">

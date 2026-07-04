@@ -106,7 +106,7 @@ export default function Upcoming() {
                   <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
                     <path d="M9 0C4.029 0 0 4.029 0 9C0 15.75 9 22 9 22C9 22 18 15.75 18 9C18 4.029 13.971 0 9 0ZM9 12C7.343 12 6 10.657 6 9C6 7.343 7.343 6 9 6C10.657 6 12 7.343 12 9C12 10.657 10.657 12 9 12Z" fill="#53433F"/>
                   </svg>
-                  {mainUpcoming.location}
+                  {mainUpcoming.location ? <a href={`https://www.google.com/maps?q=${encodeURIComponent(mainUpcoming.location)}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FF7A00", textDecoration: "underline" }}>{mainUpcoming.location}</a> : mainUpcoming.location}
                 </span>
               </div>
             </div>

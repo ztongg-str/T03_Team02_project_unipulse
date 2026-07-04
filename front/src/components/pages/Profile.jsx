@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
@@ -9,6 +10,11 @@ const API_BASE = "http://localhost:4000";
 export default function Profile() {
   const { user, updateUser } = useAuth();
   const { showToast } = useToast();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
   const [achievements, setAchievements] = useState([]);
   const [activityLog, setActivityLog] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -21,8 +27,20 @@ export default function Profile() {
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState({ avatar: false, cover: false });
+  const [coverMenuOpen, setCoverMenuOpen] = useState(false);
   const avatarRef = useRef(null);
   const coverRef = useRef(null);
+  const coverMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (coverMenuRef.current && !coverMenuRef.current.contains(e.target)) {
+        setCoverMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchProfileData();
@@ -129,21 +147,64 @@ export default function Profile() {
       {/* Cover Photo */}
       <div className="profile-cover cursor-pointer relative" style={coverSrc ? { background: `url(${coverSrc}) center/cover no-repeat` } : {}} onClick={() => coverRef.current?.click()}>
         <div className="profile-cover-gradient" />
+
+        {/* Three-dot menu top-right */}
+        <div className="profile-cover-menu-wrapper" ref={coverMenuRef}>
+          <button
+            className="profile-cover-dots"
+            onClick={(e) => { e.stopPropagation(); setCoverMenuOpen(prev => !prev); }}
+            aria-label="Cover options"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="4" r="2" />
+              <circle cx="10" cy="10" r="2" />
+              <circle cx="10" cy="16" r="2" />
+            </svg>
+          </button>
+          {coverMenuOpen && (
+            <div className="profile-cover-dropdown">
+              <button className="profile-cover-dropdown-item" onClick={(e) => { e.stopPropagation(); setCoverMenuOpen(false); coverRef.current?.click(); }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 12l4-4 3 3 3-3 2 2v2a1 1 0 01-1 1H3a1 1 0 01-1-1v-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="11" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+                Edit Photo
+              </button>
+              {coverSrc && (
+                <button className="profile-cover-dropdown-item danger" onClick={async (e) => {
+                  e.stopPropagation();
+                  setCoverMenuOpen(false);
+                  try {
+                    setUploading(prev => ({ ...prev, cover: true }));
+                    const res = await usersAPI.updateProfile({ cover_image: "" });
+                    updateUser(res.data);
+                    showToast("success", "Cover photo removed");
+                  } catch (err) {
+                    showToast("error", err.response?.data?.message || "Failed to remove cover");
+                  } finally {
+                    setUploading(prev => ({ ...prev, cover: false }));
+                  }
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 4h12M5 4V2.5a1 1 0 011-1h4a1 1 0 011 1V4M13 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M6 7v5M10 7v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  Delete Photo
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="profile-cover-actions">
-          <button className="profile-cover-btn" onClick={(e) => { e.stopPropagation(); coverRef.current?.click(); }}>
-            {uploading.cover ? (
+          {uploading.cover && (
+            <button className="profile-cover-btn" disabled>
               <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeDasharray="31.4 31.4" />
               </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M2 12l4-4 3 3 3-3 2 2v2a1 1 0 01-1 1H3a1 1 0 01-1-1v-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="11" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M2 12l4-4 3 3 3-3 2 2v2a1 1 0 01-1 1H3a1 1 0 01-1-1v-2z" fill="none"/>
-              </svg>
-            )}
-            {uploading.cover ? "Uploading..." : "Change Cover"}
-          </button>
+              Uploading...
+            </button>
+          )}
         </div>
 
         {/* Avatar — absolute over cover */}

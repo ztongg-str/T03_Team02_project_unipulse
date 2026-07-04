@@ -30,6 +30,15 @@ export default function MyRegistrations() {
     });
   };
 
+  const renderLocation = (location) => {
+    if (!location) return null;
+    return (
+      <a href={`https://www.google.com/maps?q=${encodeURIComponent(location)}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FF7A00", textDecoration: "underline" }}>
+        {location}
+      </a>
+    );
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
 
   return (
@@ -55,7 +64,7 @@ export default function MyRegistrations() {
                 <Link to={`/events/${reg.eventId}`} className="no-underline text-inherit">
                   <h3>{reg.eventTitle}</h3>
                 </Link>
-                <p>{formatDate(reg.date)} &middot; {reg.location}</p>
+                <p>{formatDate(reg.date)} &middot; {renderLocation(reg.location)}</p>
                 <p className="text-[13px] text-judge-gray mt-1">
                   Category: {reg.category}
                 </p>

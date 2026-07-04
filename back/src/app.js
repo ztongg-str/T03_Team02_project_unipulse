@@ -19,6 +19,7 @@ import historyRoutes from './modules/history/history.routes.js';
 import uploadRoutes from './modules/upload/upload.routes.js';
 import savedEventsRoutes from './modules/savedEvents/savedEvents.routes.js';
 import queryConsoleRoutes from './modules/queryConsole/queryConsole.routes.js';
+import attendanceRoutes from './modules/attendance/attendance.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +51,7 @@ app.use('/api/history', historyRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/saved-events', savedEventsRoutes);
 app.use('/api/query-console', queryConsoleRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
