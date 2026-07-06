@@ -148,3 +148,19 @@ export const attendanceAPI = {
   checkInByCode: (code) => api.post('/attendance/checkin-by-code', { code }).then((r) => r.data),
   getMyHistory: () => api.get('/attendance/my-history').then((r) => r.data),
 };
+
+export const adminRolesAPI = {
+  getAll: () => api.get('/admin-roles').then((r) => r.data),
+  getById: (id) => api.get(`/admin-roles/${id}`).then((r) => r.data),
+  getSchema: () => api.get('/admin-roles/schema').then((r) => r.data),
+  getUsersWithRoles: () => api.get('/admin-roles/users').then((r) => r.data),
+  getUserRoles: (userId) => api.get(`/admin-roles/user/${userId}`).then((r) => r.data),
+  create: (data) => api.post('/admin-roles', data).then((r) => r.data),
+  update: (id, data) => api.put(`/admin-roles/${id}`, data).then((r) => r.data),
+  delete: (id) => api.delete(`/admin-roles/${id}`).then((r) => r.data),
+  assign: (userId, roleId) => api.post('/admin-roles/assign', { userId, roleId }).then((r) => r.data),
+  unassign: (userId, roleId) => api.delete(`/admin-roles/unassign/${userId}/${roleId}`).then((r) => r.data),
+  getAccounts: () => api.get('/admin-roles/accounts').then((r) => r.data),
+  createAccount: (data) => api.post('/admin-roles/accounts', data).then((r) => r.data),
+  deleteAccount: (userId) => api.delete(`/admin-roles/accounts/${userId}`).then((r) => r.data),
+};

@@ -37,6 +37,12 @@ import AdminVerification from "./components/admin/AdminVerification";
 import AdminSettings from "./components/admin/AdminSettings";
 import AdminQueryConsole from "./components/admin/AdminQueryConsole";
 import AdminLayout from "./components/admin/AdminLayout";
+import AdminRoles from "./components/admin/AdminRoles";
+import AdminAccounts from "./components/admin/AdminAccounts";
+
+const hasAdminAccess = (user) =>
+  ["superadmin", "developer", "coordinator"].includes(user?.role) ||
+  (user?.adminRoles && user.adminRoles.length > 0);
 
 function HomeRedirect() {
   const { user, loading, updateUser } = useAuth();
@@ -46,7 +52,7 @@ function HomeRedirect() {
     if (loading) return;
     if (!user) return;
 
-    if (["superadmin", "developer", "coordinator"].includes(user.role)) {
+    if (hasAdminAccess(user)) {
       navigate("/admin/dashboard", { replace: true });
     } else if (user.role === "organizer") {
       authAPI.switchRole()
@@ -63,7 +69,7 @@ function HomeRedirect() {
 
   if (loading) return <div className="loading">Loading...</div>;
   if (!user) return <Landing />;
-  if (user.role === "student") return <StudentHome />;
+  if (user.role === "student" && !hasAdminAccess(user)) return <StudentHome />;
   return <div className="loading">Redirecting...</div>;
 }
 
@@ -74,13 +80,11 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-const ADMIN_ROLES = ["superadmin", "developer", "coordinator"];
-
 function AdminRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  if (!ADMIN_ROLES.includes(user.role)) return <Navigate to="/" replace />;
+  if (!hasAdminAccess(user)) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -99,6 +103,8 @@ function App() {
             <Route path="/admin/verification" element={<AdminVerification />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/query-console" element={<AdminQueryConsole />} />
+            <Route path="/admin/roles" element={<AdminRoles />} />
+            <Route path="/admin/role-accounts" element={<AdminAccounts />} />
           </Route>
 
           {/* ── Organizer Portal ── */}

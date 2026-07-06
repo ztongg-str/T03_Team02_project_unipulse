@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { adminUsersAPI } from "../../services/api";
+import { adminUsersAPI, adminRolesAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const ROLE_COLORS = {
@@ -75,7 +75,31 @@ export default function AdminUsers() {
   const [createModal, setCreateModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoading, setActionLoading] = useState({});
+  const [assignTarget, setAssignTarget] = useState(null);
+  const [adminRoles, setAdminRoles] = useState([]);
+  const [userRoles, setUserRoles] = useState([]);
+  const [userCustomRoles, setUserCustomRoles] = useState({});
   const LIMIT = 15;
+
+  useEffect(() => {
+    adminRolesAPI.getAll().then((res) => setAdminRoles(res.data || [])).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const fetchAllRoles = async () => {
+      const map = {};
+      for (const u of users) {
+        try {
+          const res = await adminRolesAPI.getUserRoles(u.id);
+          map[u.id] = (res.data || []).map((r) => r.name);
+        } catch { map[u.id] = []; }
+      }
+      setUserCustomRoles(map);
+    };
+    if (users.length > 0) {
+      fetchAllRoles();
+    }
+  }, [users.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const showToast = (msg, ok = true) => {
     setToast({ msg, ok });
@@ -126,6 +150,16 @@ export default function AdminUsers() {
       setDeleteTarget(null);
     } catch (e) { showToast(e.response?.data?.message || "Failed", false); }
     setLoading1(deleteTarget.id + "_del", false);
+  };
+
+  const handleAssignRole = async (user) => {
+    setAssignTarget(user);
+    try {
+      const res = await adminRolesAPI.getUserRoles(user.id);
+      setUserRoles(res.data || []);
+    } catch {
+      setUserRoles([]);
+    }
   };
 
   const totalPages = Math.ceil(total / LIMIT);
@@ -191,14 +225,14 @@ export default function AdminUsers() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ background: "#F5F5F5" }}>
-                    {["User", "Email", "Role", "Status", "Joined", "Actions"].map((h) => (
+                    {["User", "Email", "Role", "Status", "Custom Roles", "Joined", "Actions"].map((h) => (
                       <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 12, fontWeight: 700, color: "#8A7A72", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {users.length === 0 ? (
-                    <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "#8A7A72" }}>No users found</td></tr>
+                    <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#8A7A72" }}>No users found</td></tr>
                   ) : users.map((u) => (
                     <tr key={u.id} style={{ borderTop: "1px solid #F0F0F0", transition: "background 0.1s" }} onMouseEnter={(e) => e.currentTarget.style.background = "#FAFAFA"} onMouseLeave={(e) => e.currentTarget.style.background = ""}>
                       <td style={{ padding: "14px 16px" }}>
@@ -229,10 +263,20 @@ export default function AdminUsers() {
                       <td style={{ padding: "14px 16px" }}>
                         <Badge label={u.status} color={STATUS_COLORS[u.status]} bg={STATUS_COLORS[u.status] + "22"} />
                       </td>
+                      <td style={{ padding: "14px 16px", fontSize: 12, color: "#8A7A72", maxWidth: 200 }}>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                          {(userCustomRoles[u.id] || []).length > 0 ? userCustomRoles[u.id].map((r) => (
+                            <span key={r} style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "#FF7A0018", color: "#FF7A00" }}>{r}</span>
+                          )) : <span style={{ color: "#C0C0C0", fontSize: 11 }}>None</span>}
+                        </div>
+                      </td>
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#8A7A72", whiteSpace: "nowrap" }}>{fmtDate(u.createdAt)}</td>
                       <td style={{ padding: "14px 16px" }}>
                         {u.id !== me?.id && (
                           <div style={{ display: "flex", gap: 8 }}>
+                            <button onClick={() => handleAssignRole(u)} title="Assign Roles" style={{ padding: "6px 10px", border: "1.5px solid #FF7A00", color: "#FF7A00", borderRadius: 8, background: "none", cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 600 }}>
+                              Roles
+                            </button>
                             <button onClick={() => handleStatusToggle(u)} disabled={actionLoading[u.id + "_status"]} title={u.status === "active" ? "Suspend" : "Activate"} style={{ padding: "6px 12px", border: "1.5px solid", borderColor: u.status === "active" ? "#ef4444" : "#22c55e", color: u.status === "active" ? "#ef4444" : "#22c55e", borderRadius: 8, background: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "inherit" }}>
                               {u.status === "active" ? "Suspend" : "Activate"}
                             </button>
@@ -264,8 +308,60 @@ export default function AdminUsers() {
         )}
       </div>
 
+      {/* Assign Roles Modal */}
+      {assignTarget && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setAssignTarget(null)}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: 32, width: 480, maxWidth: "calc(100vw - 32px)", boxShadow: "0 8px 40px rgba(0,0,0,0.18)" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#333" }}>Assign Roles — {assignTarget.fullName}</h3>
+              <button onClick={() => setAssignTarget(null)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#8A7A72", lineHeight: 1 }}>×</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {adminRoles.length === 0 ? (
+                <p style={{ color: "#8A7A72", fontSize: 14 }}>No roles available. Go to Admin Roles to create one.</p>
+              ) : adminRoles.map((role) => {
+                const assigned = userRoles.some((r) => r.id === role.id);
+                return (
+                  <label key={role.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10, border: "1.5px solid", borderColor: assigned ? "#FF7A00" : "#E0E0E0", background: assigned ? "#FFF5EB" : "#fff", cursor: "pointer", transition: "all 0.15s" }}>
+                    <input
+                      type="checkbox"
+                      checked={assigned}
+                      onChange={async () => {
+                        try {
+                          if (assigned) {
+                            await adminRolesAPI.unassign(assignTarget.id, role.id);
+                            setUserRoles((prev) => prev.filter((r) => r.id !== role.id));
+                            setUserCustomRoles((prev) => ({ ...prev, [assignTarget.id]: (prev[assignTarget.id] || []).filter((n) => n !== role.name) }));
+                          } else {
+                            await adminRolesAPI.assign(assignTarget.id, role.id);
+                            setUserRoles((prev) => [...prev, role]);
+                            setUserCustomRoles((prev) => ({ ...prev, [assignTarget.id]: [...(prev[assignTarget.id] || []), role.name] }));
+                          }
+                          showToast(assigned ? "Role unassigned" : "Role assigned");
+                        } catch (e) {
+                          showToast(e.response?.data?.message || "Failed", false);
+                        }
+                      }}
+                      style={{ width: 18, height: 18, accentColor: "#FF7A00", cursor: "pointer", flexShrink: 0 }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: "#333" }}>{role.name}</div>
+                      <div style={{ fontSize: 12, color: "#8A7A72" }}>{role.description || "No description"}</div>
+                    </div>
+                    {role.is_system && <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "#6366f122", color: "#6366f1" }}>System</span>}
+                  </label>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+              <button onClick={() => setAssignTarget(null)} style={{ padding: "10px 20px", border: "1.5px solid #E0E0E0", borderRadius: 10, background: "none", fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Done</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create Modal */}
-      {createModal && <CreateUserModal onClose={() => setCreateModal(false)} onCreated={(u) => { setUsers((p) => [u, ...p]); setTotal((t) => t + 1); showToast(`${u.fullName} created`); }} />}
+      {createModal && <CreateUserModal adminRoles={adminRoles} onClose={() => setCreateModal(false)} onCreated={(u) => { setUsers((p) => [u, ...p]); setTotal((t) => t + 1); showToast(`${u.fullName} created`); }} />}
 
       {/* Delete Confirm */}
       {deleteTarget && (
@@ -287,15 +383,16 @@ export default function AdminUsers() {
   );
 }
 
-function CreateUserModal({ onClose, onCreated }) {
+function CreateUserModal({ adminRoles = [], onClose, onCreated }) {
   const [form, setForm] = useState({ username: "", email: "", password: "", fullName: "", role: "student" });
+  const [selectedRoles, setSelectedRoles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSubmit = async () => {
     setLoading(true); setError(null);
     try {
-      const res = await adminUsersAPI.create(form);
+      const res = await adminUsersAPI.create({ ...form, adminRoleIds: selectedRoles });
       onCreated(res.data);
       onClose();
     } catch (e) { setError(e.response?.data?.message || "Failed to create user"); }
@@ -303,6 +400,12 @@ function CreateUserModal({ onClose, onCreated }) {
   };
 
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
+
+  const toggleRole = (roleId) => {
+    setSelectedRoles((prev) =>
+      prev.includes(roleId) ? prev.filter((id) => id !== roleId) : [...prev, roleId]
+    );
+  };
 
   return (
     <Modal title="Create Account" onClose={onClose}>
@@ -318,6 +421,25 @@ function CreateUserModal({ onClose, onCreated }) {
         <option value="developer">Developer</option>
         <option value="coordinator">Co-Ordinator</option>
       </SelectField>
+      {adminRoles.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 8 }}>Admin Roles (optional)</label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, border: "1.5px solid #E0E0E0", borderRadius: 10, padding: 12 }}>
+            {adminRoles.map((role) => (
+              <label key={role.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13 }}>
+                <input
+                  type="checkbox"
+                  checked={selectedRoles.includes(role.id)}
+                  onChange={() => toggleRole(role.id)}
+                  style={{ width: 16, height: 16, accentColor: "#FF7A00", cursor: "pointer" }}
+                />
+                <span style={{ fontWeight: 600, color: "#333" }}>{role.name}</span>
+                {role.description && <span style={{ color: "#8A7A72", fontSize: 12 }}>— {role.description}</span>}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
       <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 8 }}>
         <button onClick={onClose} style={{ padding: "10px 20px", border: "1.5px solid #E0E0E0", borderRadius: 10, background: "none", fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
         <button onClick={handleSubmit} disabled={loading} style={{ padding: "10px 24px", background: "#FF7A00", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>

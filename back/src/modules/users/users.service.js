@@ -1,6 +1,7 @@
 import * as usersRepository from './users.repository.js';
 import { checkAndGrant } from '../achievements/achievements.service.js';
 import { hashPassword } from '../../utils/password.js';
+import pool from '../../config/database.js';
 
 const VALID_ROLES = ['student', 'organizer', 'superadmin', 'developer', 'coordinator'];
 const ADMIN_ROLES = ['superadmin', 'developer', 'coordinator'];
@@ -50,7 +51,7 @@ export const getAllUsers = async (query) => {
 
 // ---- Admin-only operations below ----
 
-export const createUserByAdmin = async ({ username, email, password, fullName, role }) => {
+export const createUserByAdmin = async ({ username, email, password, fullName, role, adminRoleIds }) => {
   if (!username || !email || !password || !fullName) {
     const err = new Error('username, email, password and fullName are required');
     err.statusCode = 400;
@@ -82,6 +83,19 @@ export const createUserByAdmin = async ({ username, email, password, fullName, r
 
   const hashed = await hashPassword(password);
   const userId = await usersRepository.create({ username, email, password: hashed, fullName, role });
+
+  // Assign admin roles if provided
+  if (adminRoleIds && Array.isArray(adminRoleIds) && adminRoleIds.length > 0) {
+    for (const roleId of adminRoleIds) {
+      try {
+        await pool.query(
+          'INSERT IGNORE INTO user_admin_roles (userId, roleId, assignedBy) VALUES (?, ?, ?)',
+          [userId, roleId, null]
+        );
+      } catch { /* ignore duplicates */ }
+    }
+  }
+
   return usersRepository.findById(userId);
 };
 

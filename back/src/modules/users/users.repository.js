@@ -60,9 +60,9 @@ export const findAll = async ({ page = 1, limit = 20, role, status, search }) =>
 
 export const create = async ({ username, email, password, fullName, role }) => {
   const [result] = await pool.query(
-    `INSERT INTO users (username, email, password, fullName, role, status)
-     VALUES (?, ?, ?, ?, ?, 'active')`,
-    [username, email, password, fullName, role]
+    `INSERT INTO users (username, email, password, fullName, role, status, isVerified)
+     VALUES (?, ?, ?, ?, ?, 'active', ?)`,
+    [username, email, password, fullName, role, true]
   );
   return result.insertId;
 };

@@ -151,5 +151,9 @@ export const viewFriendProfile = async (userId, friendUserId) => {
     err.statusCode = 404;
     throw err;
   }
-  return user;
+  const [friendCount, events] = await Promise.all([
+    friendsRepository.getFriendCount(friendUserId),
+    friendsRepository.getFriendEvents(friendUserId),
+  ]);
+  return { ...user, friendCount, events };
 };

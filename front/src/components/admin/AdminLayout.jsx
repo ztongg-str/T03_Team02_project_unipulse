@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 const ROLE_LABELS = {
   superadmin: "Super Admin",
   developer:  "Developer",
-  coordinator: "Co-Ordinator",
+  coordinator: "Coordinator",
   admin: "Admin", // legacy
 };
 
@@ -78,6 +78,28 @@ const ALL_NAV_ITEMS = [
     ),
   },
   {
+    to: "/admin/roles",
+    label: "Admin Roles",
+    roles: ["superadmin"],
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M14 6a3 3 0 11-6 0 3 3 0 016 0zM2 18c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6M12 9a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="14" cy="9" r="1.5" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    to: "/admin/role-accounts",
+    label: "Role Accounts",
+    roles: ["superadmin"],
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M2 8h16M8 11h4M7 14h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     to: "/admin/settings",
     label: "Settings",
     roles: ["superadmin", "developer", "coordinator"],
@@ -90,21 +112,57 @@ const ALL_NAV_ITEMS = [
   },
 ];
 
+// Map nav items to RBAC modules for custom role checking
+const NAV_TO_MODULE = {
+  "/admin/users": "users",
+  "/admin/events": "events",
+  "/admin/verification": "events",
+};
+
+const hasAdminAccess = (user) =>
+  ["superadmin", "developer", "coordinator"].includes(user?.role) ||
+  (user?.adminRoles && user.adminRoles.length > 0);
+
+const userCanSeeNavItem = (item, user) => {
+  // Built-in role check
+  if (item.roles.includes(user?.role)) return true;
+  // Custom admin role check
+  if (user?.adminRoles?.length > 0) {
+    const module = NAV_TO_MODULE[item.to];
+    if (!module) return false; // dashboard, query-console, roles, settings — no module mapping
+    return user.adminRoles.some((role) => {
+      const perms = role.permissions?.[module];
+      return perms && perms.length > 0;
+    });
+  }
+  return false;
+};
+
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const sidebarRef = useRef(null);
   const overlayRef = useRef(null);
 
   const role = user?.role || "superadmin";
-  const roleLabel = ROLE_LABELS[role] || "Admin";
-  const roleColor = ROLE_COLORS[role] || "#FF7A00";
+  const roleLabel = hasAdminAccess(user) && !ROLE_LABELS[role]
+    ? user.adminRoles?.map((r) => r.name).join(", ")
+    : (ROLE_LABELS[role] || "Admin");
+  const roleColor = ROLE_COLORS[role] || (hasAdminAccess(user) && !ROLE_LABELS[role] ? "#FF7A00" : "#FF7A00");
 
   // Filter nav items to those the current role can see
-  const navItems = ALL_NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const navItems = ALL_NAV_ITEMS.filter((item) => userCanSeeNavItem(item, user));
+
+  const DASHBOARD_TITLE = {
+    superadmin: "System Administration",
+    developer: "Developer Console",
+    coordinator: "Event Management",
+  };
 
   const handleLogout = () => {
+    setShowLogoutModal(false);
     logout();
     navigate("/");
   };
@@ -152,7 +210,7 @@ export default function AdminLayout() {
             className="org-sidebar-subtitle"
             style={{ color: roleColor, fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}
           >
-            {roleLabel} Portal
+            {role === "superadmin" ? "System Administration" : `${roleLabel} Portal`}
           </div>
         </div>
 
@@ -200,7 +258,7 @@ export default function AdminLayout() {
               </div>
             </div>
           </div>
-          <button className="org-sidebar-logout" onClick={handleLogout}>
+          <button className="org-sidebar-logout" onClick={() => setShowLogoutModal(true)}>
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M7 16H3a1 1 0 01-1-1V3a1 1 0 011-1h4M12 13l4-4-4-4M16 9H7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -237,7 +295,7 @@ export default function AdminLayout() {
                 )}
               </svg>
             </button>
-            <span style={{ fontWeight: 700, fontSize: 18, color: "#333" }}>Admin Dashboard</span>
+            <span style={{ fontWeight: 700, fontSize: 18, color: "#333" }}>{DASHBOARD_TITLE[role] || "Administration"}</span>
           </div>
 
           <div className="org-topbar-actions">
@@ -261,6 +319,19 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-1000" onClick={() => setShowLogoutModal(false)}>
+          <div className="bg-white rounded-2xl p-8 w-[400px] max-w-[90vw] shadow-[0_16px_48px_rgba(0,0,0,0.15)]" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-bold text-[22px] text-cocoa mb-2">Leave UniPulse?</h3>
+            <p className="text-base text-kabul mb-6 leading-relaxed">Are you sure you want to log out? You'll need to sign in again to access your account.</p>
+            <div className="flex gap-3 justify-end">
+              <button className="px-6 py-2.5 rounded-full font-semibold text-base bg-dawn-pink text-kabul hover:bg-[#E8D5CE]" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="px-6 py-2.5 rounded-full font-semibold text-base bg-orange text-white hover:bg-[#E66A00]" onClick={handleLogout}>Log Out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

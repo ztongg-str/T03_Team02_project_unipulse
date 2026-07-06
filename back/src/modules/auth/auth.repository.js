@@ -15,7 +15,22 @@ export const findById = async (id) => {
     'SELECT id, username, email, fullName, role, avatar, cover_image, bio, xp, level, createdAt FROM users WHERE id = ?',
     [id]
   );
-  return rows[0] || null;
+  const user = rows[0] || null;
+  if (user) {
+    const [roleRows] = await pool.query(
+      `SELECT ar.id, ar.name, ar.permissions
+       FROM admin_roles ar
+       JOIN user_admin_roles uar ON ar.id = uar.roleId
+       WHERE uar.userId = ?`,
+      [id]
+    );
+    user.adminRoles = roleRows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      permissions: typeof r.permissions === 'string' ? JSON.parse(r.permissions) : r.permissions,
+    }));
+  }
+  return user;
 };
 
 export const createUser = async ({ username, email, password, fullName}) => {

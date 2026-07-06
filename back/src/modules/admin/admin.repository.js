@@ -79,3 +79,25 @@ export const getLastBackup = async () => {
   );
   return rows[0] || null;
 };
+
+export const createAdminUser = async ({ username, email, password, fullName, role }) => {
+  const [existingEmail] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+  if (existingEmail.length > 0) {
+    const err = new Error('Email already in use');
+    err.statusCode = 409;
+    throw err;
+  }
+
+  const [existingUsername] = await pool.query('SELECT id FROM users WHERE username = ?', [username]);
+  if (existingUsername.length > 0) {
+    const err = new Error('Username already in use');
+    err.statusCode = 409;
+    throw err;
+  }
+
+  const [result] = await pool.query(
+    'INSERT INTO users (username, email, password, fullName, role, status, emailVerified) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [username, email, password, fullName, role || 'admin', 'active', true]
+  );
+  return result.insertId;
+};

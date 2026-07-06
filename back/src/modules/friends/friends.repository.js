@@ -87,6 +87,27 @@ export const getSentRequests = async (userId) => {
   return rows;
 };
 
+export const getFriendCount = async (userId) => {
+  const [rows] = await pool.query(
+    `SELECT COUNT(*) as count FROM friends
+     WHERE (userId = ? OR friendId = ?) AND status = 'accepted'`,
+    [userId, userId]
+  );
+  return rows[0].count;
+};
+
+export const getFriendEvents = async (userId) => {
+  const [rows] = await pool.query(
+    `SELECT e.id, e.title, e.date, e.location, e.category, e.image
+     FROM registrations r
+     JOIN events e ON r.eventId = e.id
+     WHERE r.userId = ? AND e.status = 'approved'
+     ORDER BY e.date DESC`,
+    [userId]
+  );
+  return rows;
+};
+
 export const discoverUsers = async (userId) => {
   const [rows] = await pool.query(
     `SELECT u.id, u.username, u.fullName, u.avatar

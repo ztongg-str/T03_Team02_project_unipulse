@@ -44,7 +44,7 @@ export default function Landing() {
           </div>
         </div>
 
-        <div className="landing-hero-image w-[576px] h-[500px] relative shrink-0">
+        <div className="landing-hero-image w-[576px] h-[500px] relative shrink-0 overflow-hidden" style={{ borderRadius: 24 }}>
           <div className="absolute w-[576px] h-[500px] -left-[12.69px] -top-[14.73px] bg-yellow opacity-20 rounded-3xl rotate-[3deg]" />
           <div className="w-[576px] h-[500px] rounded-3xl bg-gradient-to-br from-orange to-[#ff6b6b] border-4 border-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex items-center justify-center text-white text-2xl font-bold relative">
             Vibrant Campus Life

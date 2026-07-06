@@ -188,6 +188,67 @@ BEGIN
 END//
 DELIMITER ;
 
+-- ── RBAC: Custom admin roles ─────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS admin_roles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  description TEXT,
+  permissions JSON NOT NULL DEFAULT ('{}'),
+  is_system BOOLEAN DEFAULT FALSE,
+  createdBy INT,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (createdBy) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- User-to-role assignments
+CREATE TABLE IF NOT EXISTS user_admin_roles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL,
+  roleId INT NOT NULL,
+  assignedBy INT,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (roleId) REFERENCES admin_roles(id) ON DELETE CASCADE,
+  FOREIGN KEY (assignedBy) REFERENCES users(id) ON DELETE SET NULL,
+  UNIQUE KEY unique_user_role (userId, roleId)
+);
+
+-- Seed example custom roles
+INSERT IGNORE INTO admin_roles (id, name, description, permissions, is_system) VALUES
+(1, 'Event Manager',
+ 'Manages events, approvals, and registrations',
+ '{"events":["view","create","update","delete","approve"],"registrations":["view","export"],"reports":["view"]}',
+ FALSE),
+(2, 'User Manager',
+ 'Manages user accounts and roles',
+ '{"users":["view","create","update","delete","manage"],"reports":["view","export"]}',
+ FALSE),
+(3, 'Moderator',
+ 'Reviews content and handles reports',
+ '{"events":["view","approve"],"users":["view"],"reports":["view","update","manage"],"feedback":["view","update","delete"]}',
+ FALSE),
+(4, 'Coordinator',
+ 'Manages users, events, and event verification',
+ '{"users":["view","create","update","delete"],"events":["view","create","update","delete","approve"],"registrations":["view","export"],"reports":["view"]}',
+ FALSE),
+(5, 'Developer',
+ 'System health, backup, restore, and query console',
+ '{"reports":["view","export"]}',
+ FALSE);
+
+-- Admin account credentials (recoverable passwords for super admin management)
+CREATE TABLE IF NOT EXISTS admin_credentials (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL,
+  password_encrypted TEXT NOT NULL,
+  createdBy INT,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (createdBy) REFERENCES users(id) ON DELETE SET NULL
+);
+
 -- Seed 10 challenge-based achievements
 INSERT IGNORE INTO achievements (id, name, description, icon, criteria) VALUES
 (1, 'First Step',       'Register for your first event',                               '/icons/first_step.png',    'register_1_event'),

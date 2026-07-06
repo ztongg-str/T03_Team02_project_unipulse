@@ -7,8 +7,10 @@ export default function OrganizerLayout() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
+    setShowLogoutModal(false);
     logout();
     navigate("/");
   };
@@ -86,7 +88,7 @@ export default function OrganizerLayout() {
             </svg>
             Back to Student
           </button>
-          <button className="org-sidebar-logout-btn" onClick={handleLogout}>
+          <button className="org-sidebar-logout-btn" onClick={() => setShowLogoutModal(true)}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M6 14H2a1 1 0 01-1-1V3a1 1 0 011-1h4M11 11l3-3-3-3M14 8H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -123,6 +125,19 @@ export default function OrganizerLayout() {
           <Outlet />
         </main>
       </div>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-1000" onClick={() => setShowLogoutModal(false)}>
+          <div className="bg-white rounded-2xl p-8 w-[400px] max-w-[90vw] shadow-[0_16px_48px_rgba(0,0,0,0.15)]" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-bold text-[22px] text-cocoa mb-2">Leave UniPulse?</h3>
+            <p className="text-base text-kabul mb-6 leading-relaxed">Are you sure you want to log out? You'll need to sign in again to access your account.</p>
+            <div className="flex gap-3 justify-end">
+              <button className="px-6 py-2.5 rounded-full font-semibold text-base bg-dawn-pink text-kabul hover:bg-[#E8D5CE]" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="px-6 py-2.5 rounded-full font-semibold text-base bg-orange text-white hover:bg-[#E66A00]" onClick={handleLogout}>Log Out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

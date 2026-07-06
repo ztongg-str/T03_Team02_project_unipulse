@@ -50,6 +50,11 @@ html {
   scroll-padding-top: 82px;
 }
 
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   font-family: var(--font-family-plus-jakarta);
   background: #FCFCFA;
@@ -2600,6 +2605,73 @@ input, textarea, select { font-family: inherit; outline: none; }
 }
 
 .org-sidebar-logout-btn:hover {
+  background: var(--color-pink-bg);
+  color: var(--color-pink);
+}
+
+.org-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+}
+
+.org-sidebar-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF7A00, #FF9A3C);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.org-sidebar-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.org-sidebar-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2D1B14;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.org-sidebar-user-role {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 1px;
+}
+
+.org-sidebar-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  color: var(--color-judge-gray);
+  transition: all 0.15s;
+}
+
+.org-sidebar-logout:hover {
   background: var(--color-pink-bg);
   color: var(--color-pink);
 }

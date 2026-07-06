@@ -1,4 +1,5 @@
 import * as adminRepository from './admin.repository.js';
+import { hashPassword } from '../../utils/password.js';
 import logger from '../../config/logger.js';
 
 export const getDashboard = async () => {
@@ -7,6 +8,18 @@ export const getDashboard = async () => {
 
 export const getAdminLogs = async (query) => {
   return adminRepository.getLogs(query);
+};
+
+export const createAdmin = async ({ username, email, password, fullName, role }) => {
+  const hashedPassword = await hashPassword(password);
+  const userId = await adminRepository.createAdminUser({
+    username,
+    email,
+    password: hashedPassword,
+    fullName,
+    role,
+  });
+  return { id: userId, username, email, fullName, role };
 };
 
 export const getSystemHealth = async () => {

@@ -27,6 +27,7 @@ const env = {
   emailUser: process.env.EMAIL_USER || '',
   emailPass: process.env.EMAIL_PASS || '',
   bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS, 10) || 10,
+  cryptoKey: process.env.CRYPTO_KEY || 'unipulse_default_crypto_key_32bytes!',
   nodeEnv: process.env.NODE_ENV || 'development',
 };
 

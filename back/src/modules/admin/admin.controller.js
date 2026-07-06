@@ -19,6 +19,15 @@ export const getAdminLogs = async (req, res, next) => {
   }
 };
 
+export const createAdmin = async (req, res, next) => {
+  try {
+    const user = await adminService.createAdmin(req.body);
+    return success(res, user, 'Admin account created');
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 500);
+  }
+};
+
 export const getSystemHealth = async (req, res, next) => {
   try {
     const health = await adminService.getSystemHealth();
