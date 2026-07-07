@@ -18,10 +18,13 @@ export const getProfile = async (userId) => {
 };
 
 export const updateProfile = async (userId, data) => {
-  const allowedFields = ['fullName', 'avatar', 'cover_image', 'bio'];
+  const allowedFields = ['fullName', 'avatar', 'cover_image', 'bio', 'interests'];
   const updates = {};
   for (const key of allowedFields) {
     if (data[key] !== undefined) updates[key] = data[key];
+  }
+  if (updates.interests && Array.isArray(updates.interests)) {
+    updates.interests = JSON.stringify(updates.interests);
   }
   if (Object.keys(updates).length === 0) {
     const err = new Error('No valid fields to update');

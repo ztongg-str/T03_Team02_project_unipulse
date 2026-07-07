@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { friendsAPI } from "../../services/api";
+import { friendsAPI, achievementsAPI } from "../../services/api";
+
+const achievementIcon = (ach) => ach.icon || '🏆';
 
 export default function FriendProfile() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [friend, setFriend] = useState(null);
+  const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [eventTab, setEventTab] = useState("upcoming");
 
@@ -15,8 +18,13 @@ export default function FriendProfile() {
 
   const fetchFriend = async () => {
     try {
-      const res = await friendsAPI.getProfile(userId);
-      setFriend(res.data);
+      const [profileRes, achRes] = await Promise.allSettled([
+        friendsAPI.getProfile(userId),
+        achievementsAPI.getByUserId(userId),
+      ]);
+      if (profileRes.status === "fulfilled") setFriend(profileRes.value.data);
+      else navigate("/friends");
+      if (achRes.status === "fulfilled") setAchievements(achRes.value.data || []);
     } catch {
       navigate("/friends");
     } finally {
@@ -68,6 +76,38 @@ export default function FriendProfile() {
           </div>
         </div>
       </div>
+
+      {achievements.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-xl font-bold text-cocoa mb-3">Achievements ({achievements.length})</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {achievements.map((ach) => (
+              <div key={ach.id} className="flex items-center gap-3 bg-white rounded-xl p-3 border border-border-color">
+                <div className="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center text-lg flex-shrink-0">
+                  {achievementIcon(ach)}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-cocoa">{ach.name}</div>
+                  <div className="text-xs text-judge-gray">{ach.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {friend.interests?.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-xl font-bold text-cocoa mb-3">Interests</h2>
+          <div className="flex flex-wrap gap-2">
+            {friend.interests.map((interest, i) => (
+              <span key={i} className="px-3 py-1.5 bg-orange-bg text-orange rounded-full text-sm font-medium">
+                {interest}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-3 mt-6 mb-4">
         <button className="btn btn-secondary btn-small" onClick={() => navigate("/friends")}>

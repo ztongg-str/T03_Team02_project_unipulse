@@ -3,9 +3,17 @@ import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-import { eventsAPI, achievementsAPI, activityLogsAPI, friendsAPI, usersAPI, uploadAPI, historyAPI } from "../../services/api";
+import { achievementsAPI, friendsAPI, usersAPI, uploadAPI, historyAPI } from "../../services/api";
 
 const API_BASE = "http://localhost:4000";
+
+const INTEREST_OPTIONS = [
+  "Music", "Technology", "Sports", "Art", "Networking",
+  "Gaming", "Photography", "Reading", "Travel", "Cooking",
+  "Fashion", "Film & TV", "Fitness", "Volunteering", "Entrepreneurship",
+];
+
+const achievementIcon = (ach) => ach.icon || '🏆';
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
@@ -16,14 +24,13 @@ export default function Profile() {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [pathname]);
   const [achievements, setAchievements] = useState([]);
-  const [activityLog, setActivityLog] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [friendCount, setFriendCount] = useState(0);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     fullName: user?.fullName || "",
     bio: user?.bio || "",
-    interests: user?.interests?.join(", ") || "",
+    interests: user?.interests || [],
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState({ avatar: false, cover: false });
@@ -48,15 +55,13 @@ export default function Profile() {
 
   const fetchProfileData = async () => {
     try {
-      const [achRes, actRes, evRes, frRes, userRes] = await Promise.allSettled([
+      const [achRes, evRes, frRes, userRes] = await Promise.allSettled([
         achievementsAPI.getMy(),
-        activityLogsAPI.getMy(),
         historyAPI.getUpcoming(),
         friendsAPI.getMy(),
         usersAPI.getProfile(),
       ]);
       if (achRes.status === "fulfilled") setAchievements(achRes.value.data || []);
-      if (actRes.status === "fulfilled") setActivityLog(actRes.value.data || []);
       if (evRes.status === "fulfilled") setUpcomingEvents((evRes.value.data || []).slice(0, 3));
       if (frRes.status === "fulfilled") setFriendCount(frRes.value.data?.length || 0);
       if (userRes.status === "fulfilled" && userRes.value.data) {
@@ -66,7 +71,17 @@ export default function Profile() {
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "interests") {
+      const value = e.target.value;
+      setForm({
+        ...form,
+        interests: form.interests.includes(value)
+          ? form.interests.filter((i) => i !== value)
+          : [...form.interests, value],
+      });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSave = async () => {
@@ -74,7 +89,7 @@ export default function Profile() {
     try {
       const res = await usersAPI.updateProfile({
         ...form,
-        interests: form.interests ? form.interests.split(",").map(s => s.trim()).filter(Boolean) : [],
+        interests: Array.isArray(form.interests) ? form.interests : [],
       });
       updateUser(res.data);
       showToast("success", "Profile updated successfully");
@@ -115,24 +130,9 @@ export default function Profile() {
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
-  const formatActivityTime = (dateStr) => {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diff = now - d;
-    const mins = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    if (mins < 60) return `${mins}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
-  };
-
   const allInterests = user?.interests?.length
     ? user.interests
-    : form.interests
-      ? form.interests.split(",").map(s => s.trim()).filter(Boolean)
-      : ["Music", "Technology", "Sports", "Art", "Networking"];
+    : ["Music", "Technology", "Sports", "Art", "Networking"];
 
   if (!user) return null;
 
@@ -238,6 +238,19 @@ export default function Profile() {
             <p className="profile-username">@{user.username} &middot; {user.role}</p>
             {user.bio && <p className="profile-bio">{user.bio}</p>}
             <p className="profile-joined">Joined {formatDate(user.createdAt)}</p>
+            <button
+              className="btn btn-secondary btn-small mt-3"
+              onClick={() => {
+                setForm({
+                  fullName: user?.fullName || "",
+                  bio: user?.bio || "",
+                  interests: user?.interests || [],
+                });
+                setEditing(true);
+              }}
+            >
+              Edit Profile
+            </button>
           </div>
 
           {/* Level Card */}
@@ -256,9 +269,6 @@ export default function Profile() {
         <div className="profile-section">
           <div className="profile-section-header">
             <h3 className="profile-section-title">Interests</h3>
-            {editing && (
-              <button onClick={() => setEditing(false)} className="profile-section-edit">Done</button>
-            )}
           </div>
           <div className="profile-interests">
             {allInterests.map((interest, i) => (
@@ -267,30 +277,58 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Editing Form */}
+        {/* Edit Profile Modal */}
         {editing && (
-          <div className="profile-edit-section">
-            <div className="auth-input-group">
-              <label>Full Name</label>
-              <div className="auth-input-wrapper">
-                <input name="fullName" value={form.fullName} onChange={handleChange} />
+          <div className="modal-overlay" onClick={() => { setEditing(false); setForm({ fullName: user?.fullName || "", bio: user?.bio || "", interests: user?.interests || [] }); }}>
+            <div className="modal-content profile-edit-modal" onClick={(e) => e.stopPropagation()}>
+              <h3 className="modal-title">Edit Profile</h3>
+              <div className="flex flex-col gap-4 mt-4">
+                <div className="auth-input-group">
+                  <label>Full Name</label>
+                  <div className="auth-input-wrapper">
+                    <input name="fullName" value={form.fullName} onChange={handleChange} />
+                  </div>
+                </div>
+                <div className="auth-input-group">
+                  <label>Bio</label>
+                  <div className="auth-input-wrapper">
+                    <textarea name="bio" value={form.bio} onChange={handleChange} rows={3} placeholder="Tell us about yourself" />
+                  </div>
+                </div>
+                <div className="auth-input-group">
+                  <label>Interests</label>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {INTEREST_OPTIONS.map((opt) => {
+                      const selected = form.interests.includes(opt);
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          name="interests"
+                          value={opt}
+                          onClick={handleChange}
+                          className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                            selected
+                              ? "bg-orange text-white border-orange"
+                              : "bg-white text-judge-gray border-border-color hover:border-orange"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+              <div className="modal-actions mt-6">
+                <button className="btn btn-outlined" onClick={() => { setEditing(false); setForm({ fullName: user?.fullName || "", bio: user?.bio || "", interests: user?.interests || [] }); }}>
+                  Cancel
+                </button>
+                <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
               </div>
             </div>
-            <div className="auth-input-group">
-              <label>Bio</label>
-              <div className="auth-input-wrapper">
-                <textarea name="bio" value={form.bio} onChange={handleChange} rows={3} placeholder="Tell us about yourself" />
-              </div>
-            </div>
-            <div className="auth-input-group">
-              <label>Interests (comma separated)</label>
-              <div className="auth-input-wrapper">
-                <input name="interests" value={form.interests} onChange={handleChange} placeholder="Music, Technology, Sports" />
-              </div>
-            </div>
-            <button className="auth-submit-btn max-w-[200px]" onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
           </div>
         )}
 
@@ -344,7 +382,7 @@ export default function Profile() {
               achievements.slice(0, 4).map((ach) => (
                 <div key={ach.id} className="profile-achievement">
                   <div className="profile-ach-icon bg-orange/10 text-orange">
-                    {ach.icon || "🏆"}
+                    {achievementIcon(ach)}
                   </div>
                   <div className="profile-ach-name">{ach.name}</div>
                 </div>
@@ -379,44 +417,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Activity Feed */}
-        <div className="profile-section">
-          <div className="profile-section-header">
-            <h3 className="profile-section-title">Recent Activity</h3>
-            <Link to="/activity" className="profile-section-link">View All</Link>
-          </div>
-          <div className="profile-activity-feed">
-            {activityLog.length === 0 ? (
-              <>
-                <div className="profile-activity-item">
-                  <div className="profile-activity-dot bg-orange" />
-                  <div className="profile-activity-content">
-                    <span className="profile-activity-action">Joined</span> UniPulse
-                    <span className="profile-activity-time">just now</span>
-                  </div>
-                </div>
-                <div className="profile-activity-item">
-                  <div className="profile-activity-dot bg-turquoise" />
-                  <div className="profile-activity-content">
-                    <span className="profile-activity-action">Welcome!</span> Start exploring events
-                    <span className="profile-activity-time">—</span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              activityLog.slice(0, 5).map((act) => (
-                <div key={act.id} className="profile-activity-item">
-                  <div className="profile-activity-dot bg-orange" />
-                  <div className="profile-activity-content">
-                    <span className="profile-activity-action">{act.action || "Activity"}</span>
-                    {act.description || ""}
-                    <span className="profile-activity-time">{formatActivityTime(act.createdAt)}</span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );

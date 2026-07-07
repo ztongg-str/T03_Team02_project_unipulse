@@ -1,6 +1,7 @@
 import * as authRepository from './auth.repository.js';
 import { generateToken } from '../../utils/jwt.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
+import { logActivity } from '../activityLogs/activityLogs.service.js';
 
 export const register = async ({ username, email, password, fullName }) => {
   const existingUser = await authRepository.findByEmail(email);
@@ -24,6 +25,8 @@ export const register = async ({ username, email, password, fullName }) => {
     password: hashedPassword,
     fullName
   });
+
+  logActivity(userId, 'register', JSON.stringify({ username }));
 
   const token = generateToken({ id: userId, role: 'student' });
 
@@ -49,6 +52,8 @@ export const login = async ({ email, password }) => {
   }
 
   const token = generateToken({ id: user.id, role: user.role });
+
+  logActivity(user.id, 'login', null);
 
   return {
     token,

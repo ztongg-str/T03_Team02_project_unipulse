@@ -1,6 +1,7 @@
 import * as friendsRepository from './friends.repository.js';
 import * as usersRepository from '../users/users.repository.js';
 import { checkAndGrant } from '../achievements/achievements.service.js';
+import { logActivity } from '../activityLogs/activityLogs.service.js';
 
 export const getMyFriends = async (userId) => {
   return friendsRepository.findByUserId(userId);
@@ -41,6 +42,7 @@ export const addFriend = async (userId, friendUserId) => {
     throw err;
   }
   const id = await friendsRepository.create(userId, friendUserId);
+  logActivity(userId, 'send_friend_request', JSON.stringify({ friendUserId, friendName: friendUser?.fullName || 'Unknown' }));
   return friendsRepository.findById(id);
 };
 
@@ -62,6 +64,9 @@ export const acceptFriendRequest = async (requestId, user) => {
     throw err;
   }
   await friendsRepository.accept(requestId);
+
+  const requester = await usersRepository.findById(request.userId);
+  logActivity(user.id, 'accept_friend_request', JSON.stringify({ friendUserId: request.userId, friendName: requester?.fullName || 'Unknown' }));
 
   return friendsRepository.findById(requestId);
 };

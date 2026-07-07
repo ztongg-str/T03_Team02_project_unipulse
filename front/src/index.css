@@ -1243,6 +1243,17 @@ input, textarea, select { font-family: inherit; outline: none; }
   border-bottom: none;
 }
 
+.profile-activity-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-bg-secondary);
+}
+
 .profile-activity-dot {
   width: 10px;
   height: 10px;

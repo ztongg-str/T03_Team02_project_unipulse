@@ -12,10 +12,13 @@ export const findByUsername = async (username) => {
 
 export const findById = async (id) => {
   const [rows] = await pool.query(
-    'SELECT id, username, email, fullName, role, avatar, cover_image, bio, xp, level, createdAt FROM users WHERE id = ?',
+    'SELECT id, username, email, fullName, role, avatar, cover_image, bio, interests, xp, level, createdAt FROM users WHERE id = ?',
     [id]
   );
   const user = rows[0] || null;
+  if (user && typeof user.interests === 'string') {
+    try { user.interests = JSON.parse(user.interests); } catch { user.interests = []; }
+  }
   if (user) {
     const [roleRows] = await pool.query(
       `SELECT ar.id, ar.name, ar.permissions

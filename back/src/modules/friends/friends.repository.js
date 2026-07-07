@@ -23,7 +23,7 @@ export const searchUsers = async (query, excludeUserId) => {
        END as friendStatus
      FROM users u
      LEFT JOIN friends f1 ON ((f1.userId = ? AND f1.friendId = u.id) OR (f1.userId = u.id AND f1.friendId = ?))
-     WHERE (u.username LIKE ? OR u.fullName LIKE ?) AND u.id != ?
+     WHERE (u.username LIKE ? OR u.fullName LIKE ?) AND u.id != ? AND u.role NOT IN ('superadmin','developer','coordinator')
      LIMIT 20`,
     [excludeUserId, excludeUserId, excludeUserId, excludeUserId, `%${query}%`, `%${query}%`, excludeUserId]
   );
@@ -113,6 +113,7 @@ export const discoverUsers = async (userId) => {
     `SELECT u.id, u.username, u.fullName, u.avatar
      FROM users u
      WHERE u.id != ?
+       AND u.role NOT IN ('superadmin','developer','coordinator')
        AND u.id NOT IN (
          SELECT friendId FROM friends WHERE userId = ?
          UNION

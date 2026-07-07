@@ -2,10 +2,14 @@ import pool from '../../config/database.js';
 
 export const findById = async (id) => {
   const [rows] = await pool.query(
-    'SELECT id, username, email, fullName, role, status, avatar, cover_image, bio, xp, level, createdAt FROM users WHERE id = ?',
+    'SELECT id, username, email, fullName, role, status, avatar, cover_image, bio, interests, xp, level, createdAt FROM users WHERE id = ?',
     [id]
   );
-  return rows[0] || null;
+  const user = rows[0] || null;
+  if (user && typeof user.interests === 'string') {
+    try { user.interests = JSON.parse(user.interests); } catch { user.interests = []; }
+  }
+  return user;
 };
 
 export const findByEmail = async (email) => {

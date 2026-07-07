@@ -15,7 +15,6 @@ import Profile from "./components/pages/Profile";
 import Friends from "./components/pages/Friends";
 import FriendProfile from "./components/pages/FriendProfile";
 import Achievements from "./components/pages/Achievements";
-import ActivityLog from "./components/pages/ActivityLog";
 import StudentHome from "./components/pages/StudentHome";
 import About from "./components/pages/About";
 import History from "./components/pages/History";
@@ -134,7 +133,6 @@ function App() {
             <Route path="/friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
             <Route path="/friends/profile/:userId" element={<ProtectedRoute><FriendProfile /></ProtectedRoute>} />
             <Route path="/achievements" element={<Achievements />} />
-            <Route path="/activity" element={<ActivityLog />} />
             <Route path="/history" element={<ProtectedRoute><UserHistory /></ProtectedRoute>} />
             <Route path="/scan-qr" element={<ProtectedRoute><ScanQR /></ProtectedRoute>} />
             <Route path="/upcoming" element={<ProtectedRoute><Upcoming /></ProtectedRoute>} />

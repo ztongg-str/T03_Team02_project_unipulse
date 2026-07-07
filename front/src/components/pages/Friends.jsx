@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { friendsAPI, savedEventsAPI } from "../../services/api";
+import { friendsAPI, savedEventsAPI, activityLogsAPI } from "../../services/api";
 
 const CATEGORIES = [
   { id: "all", label: "All Friends", icon: "users" },
   { id: "requests", label: "Requests", icon: "user-plus" },
   { id: "saved", label: "Saved", icon: "bookmark" },
+  { id: "activity", label: "Activity", icon: "bell" },
 ];
 
 export default function Friends() {
@@ -22,6 +23,8 @@ export default function Friends() {
   const [savedLoading, setSavedLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const [msg, setMsg] = useState({ type: "", text: "" });
+  const [activityLog, setActivityLog] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(false);
 
   useEffect(() => {
     fetchFriends();
@@ -85,6 +88,24 @@ export default function Friends() {
       setSavedLoading(false);
     }
   };
+
+  const fetchActivityLog = async () => {
+    setActivityLoading(true);
+    try {
+      const res = await activityLogsAPI.getMy();
+      setActivityLog(res.data || []);
+    } catch {
+      setActivityLog([]);
+    } finally {
+      setActivityLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeCategory === "activity") {
+      fetchActivityLog();
+    }
+  }, [activeCategory]);
 
   const handleUnsave = async (eventId) => {
     try {
@@ -159,6 +180,33 @@ export default function Friends() {
     }
   };
 
+  const formatActivityTime = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = now - d;
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
+
+  const activityIcon = (action) => {
+    const s = 18;
+    if (action === "login") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><path d="M7 3H4a1 1 0 00-1 1v10a1 1 0 001 1h3" stroke="#FF7A00" strokeWidth="1.8" strokeLinecap="round"/><path d="M12 12l3-3-3-3M7 9h8" stroke="#FF7A00" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+    if (action === "register") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#22C55E" strokeWidth="1.6"/><path d="M6 9l2 2 4-4" stroke="#22C55E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+    if (action === "create_event") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="1" stroke="#3B82F6" strokeWidth="1.6"/><path d="M2 7h14M12 1v3M6 1v3" stroke="#3B82F6" strokeWidth="1.6" strokeLinecap="round"/><path d="M9 10v4M7 12h4" stroke="#3B82F6" strokeWidth="1.6" strokeLinecap="round"/></svg>;
+    if (action === "register_event") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#A855F7" strokeWidth="1.6"/><path d="M6 9l2 2 4-4" stroke="#A855F7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+    if (action === "send_friend_request") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><circle cx="7" cy="5" r="3" stroke="#F59E0B" strokeWidth="1.6"/><path d="M12 5v6M15 8h-6" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round"/><path d="M2 14c0-3 2-5 5-5h3" stroke="#F59E0B" strokeWidth="1.6" strokeLinecap="round"/></svg>;
+    if (action === "accept_friend_request") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><circle cx="7" cy="5" r="3" stroke="#22C55E" strokeWidth="1.6"/><path d="M12 7l2 2 3-3" stroke="#22C55E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 14c0-3 2-5 5-5h3" stroke="#22C55E" strokeWidth="1.6" strokeLinecap="round"/></svg>;
+    if (action === "event_approved") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#22C55E20" stroke="#22C55E" strokeWidth="1.6"/><path d="M6 9l2 2 4-4" stroke="#22C55E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+    if (action === "event_rejected") return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#EF444420" stroke="#EF4444" strokeWidth="1.6"/><path d="M6 6l6 6M12 6l-6 6" stroke="#EF4444" strokeWidth="1.8" strokeLinecap="round"/></svg>;
+    return <svg width={s} height={s} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6" stroke="#85736B" strokeWidth="1.6"/></svg>;
+  };
+
   const filteredFriends = activeCategory === "all"
     ? friends
     : [];
@@ -181,6 +229,9 @@ export default function Friends() {
     }
     if (icon === "bookmark") {
       return <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2h10v14l-5-4-5 4V2z" stroke={color} strokeWidth="2" strokeLinejoin="round"/></svg>;
+    }
+    if (icon === "bell") {
+      return <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 00-5 5v3l-1 2h12l-1-2V7a5 5 0 00-5-5z" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M6.5 14a2.5 2.5 0 005 0" stroke={color} strokeWidth="1.6" strokeLinejoin="round"/></svg>;
     }
     return null;
   };
@@ -291,6 +342,45 @@ export default function Friends() {
                     </button>
                   </div>
                 ))}
+              </div>
+            )}
+          </>
+        ) : activeCategory === "activity" ? (
+          <>
+            <div className="friends-section-header">
+              <h3 className="friends-section-title">
+                Activity Feed
+                <span className="friends-count"> ({activityLog.length})</span>
+              </h3>
+            </div>
+
+            {activityLoading ? (
+              <div className="loading">Loading activity...</div>
+            ) : activityLog.length === 0 ? (
+              <div className="empty-state">
+                <h3>No activity yet</h3>
+                <p>Your actions on UniPulse will appear here</p>
+              </div>
+            ) : (
+              <div className="profile-activity-feed">
+                {activityLog.map((act) => {
+                  let details = null;
+                  try { details = act.details ? JSON.parse(act.details) : null; } catch { details = act.details; }
+                  const icon = activityIcon(act.action);
+                  return (
+                    <div key={act.id} className="profile-activity-item">
+                      <div className="profile-activity-icon">{icon}</div>
+                      <div className="profile-activity-content" style={{ flex: 1 }}>
+                        <span className="profile-activity-action">{act.action.replace(/_/g, ' ')}</span>
+                        {details?.eventTitle && <span> &mdash; {details.eventTitle}</span>}
+                        {details?.friendName && <span> &mdash; {details.friendName}</span>}
+                        {act.action === 'login' && <span> &mdash; Logged into your account</span>}
+                        {act.action === 'register' && <span> &mdash; Joined UniPulse</span>}
+                        <span className="profile-activity-time">{formatActivityTime(act.createdAt)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </>

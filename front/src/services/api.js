@@ -84,6 +84,7 @@ export const friendsAPI = {
 
 export const achievementsAPI = {
   getMy: () => api.get("/achievements").then((r) => r.data),
+  getByUserId: (userId) => api.get(`/achievements/user/${userId}`).then((r) => r.data),
   getAllWithStatus: () => api.get("/achievements/status").then((r) => r.data),
 };
 

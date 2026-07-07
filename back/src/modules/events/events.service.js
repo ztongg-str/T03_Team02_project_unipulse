@@ -1,4 +1,5 @@
 import * as eventsRepository from './events.repository.js';
+import { logActivity } from '../activityLogs/activityLogs.service.js';
 
 export const getAllEvents = async (query, user) => {
   return eventsRepository.findAll(query, user);
@@ -24,7 +25,9 @@ export const getEventById = async (id) => {
 
 export const createEvent = async (data) => {
   const eventId = await eventsRepository.create(data);
-  return eventsRepository.findById(eventId);
+  const event = await eventsRepository.findById(eventId);
+  logActivity(data.organizerId, 'create_event', JSON.stringify({ eventId, eventTitle: event?.title || 'Untitled' }));
+  return event;
 };
 
 export const saveDraft = async (data) => {
@@ -96,6 +99,7 @@ export const approveEvent = async (id, user) => {
     verifiedBy: user.id,
     verifiedAt: new Date(),
   });
+  logActivity(event.organizerId, 'event_approved', JSON.stringify({ eventId: id, eventTitle: event.title }));
   return eventsRepository.findById(id);
 };
 
@@ -117,5 +121,6 @@ export const rejectEvent = async (id, user, reason) => {
     verifiedBy: user.id,
     verifiedAt: new Date(),
   });
+  logActivity(event.organizerId, 'event_rejected', JSON.stringify({ eventId: id, eventTitle: event.title, reason: reason.trim() }));
   return eventsRepository.findById(id);
 };

@@ -10,6 +10,15 @@ export const getMyAchievements = async (req, res, next) => {
   }
 };
 
+export const getUserAchievements = async (req, res, next) => {
+  try {
+    const achievements = await achievementsService.getMyAchievements(req.params.userId);
+    return success(res, achievements);
+  } catch (err) {
+    return error(res, err.message, err.statusCode || 500);
+  }
+};
+
 export const getAllAchievements = async (req, res, next) => {
   try {
     const achievements = await achievementsService.getAllAchievements();

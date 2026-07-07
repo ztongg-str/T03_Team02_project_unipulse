@@ -3,13 +3,13 @@ DELETE FROM user_achievements;
 DELETE FROM achievements;
 
 INSERT INTO achievements (id, name, description, icon, criteria) VALUES
-(1, 'First Step',    'Register for your first event',                               '/icons/first_step.png',    'register_1_event'),
-(2, 'Campus Regular','Attend 3 events',                                              '/icons/campus_regular.png','attend_3_events'),
-(3, 'Social Butterfly','Add 3 friends on UniPulse',                                  '/icons/social.png',        'add_3_friends'),
-(4, 'Networker',     'Add 10 friends on UniPulse',                                   '/icons/networker.png',     'add_10_friends'),
-(5, 'Explorer',      'Register for events in 3 different categories',                '/icons/explorer.png',      'explore_3_categories'),
-(6, 'Rising Star',    'Reach level 5',                                                '/icons/rising_star.png',   'level_5'),
-(7, 'Veteran',        'Reach level 10',                                               '/icons/veteran.png',       'level_10'),
-(8, 'Profile Star',   'Complete your profile with a bio and avatar',                 '/icons/profile_star.png',  'complete_profile'),
-(9, 'Dedicated',      'Have 5 active registrations at once',                         '/icons/dedicated.png',     'book_5_events'),
-(10,'Pentathlon',     'Earn 5 achievements',                                          '/icons/pentathlon.png',    'earn_5_achievements');
+(1, 'First Step',    'Register for your first event',                               '👣', 'register_1_event'),
+(2, 'Campus Regular','Attend 3 events',                                              '🏛️', 'attend_3_events'),
+(3, 'Social Butterfly','Add 3 friends on UniPulse',                                  '🦋', 'add_3_friends'),
+(4, 'Networker',     'Add 10 friends on UniPulse',                                   '🤝', 'add_10_friends'),
+(5, 'Explorer',      'Register for events in 3 different categories',                '🧭', 'explore_3_categories'),
+(6, 'Rising Star',    'Reach level 5',                                                '⭐', 'level_5'),
+(7, 'Veteran',        'Reach level 10',                                               '🎖️', 'level_10'),
+(8, 'Profile Star',   'Complete your profile with bio and photo',                    '🌟', 'complete_profile'),
+(9, 'Dedicated',      'Have 5 active registrations at once',                         '🔥', 'book_5_events'),
+(10,'Pentathlon',     'Earn 5 achievements',                                          '🏅', 'earn_5_achievements');
