@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
+import slowQueryLogger from './middlewares/slowQueryLogger.js';
 
 import authRoutes from './modules/auth/auth.routes.js';
 import otpRoutes from './modules/auth/otp.routes.js';
@@ -28,6 +29,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(cors());
+app.use(slowQueryLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

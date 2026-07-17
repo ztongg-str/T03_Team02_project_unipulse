@@ -15,9 +15,6 @@ const env = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     name: process.env.DB_NAME || 'unipulse',
-    // Aiven (and most managed MySQL hosts) require SSL. Local development
-    // against a plain local MySQL/MariaDB instance usually doesn't support
-    // it, so this can be turned off with DB_SSL=false in .env.
     ssl: process.env.DB_SSL !== 'false',
   },
   jwt: {

@@ -65,6 +65,15 @@ export const updateEvent = async (id, data, user) => {
   for (const key of allowedFields) {
     if (data[key] !== undefined) updates[key] = data[key];
   }
+
+  const isAdmin = ADMIN_ROLES.includes(user.role);
+  if (!isAdmin && Object.keys(updates).length > 0) {
+    updates.status = 'pending';
+    updates.rejectionReason = null;
+    updates.verifiedBy = null;
+    updates.verifiedAt = null;
+  }
+
   await eventsRepository.update(id, updates);
   return eventsRepository.findById(id);
 };

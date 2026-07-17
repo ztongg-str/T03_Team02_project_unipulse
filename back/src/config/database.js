@@ -12,6 +12,10 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
 
+  connectTimeout: 10000,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000,
+
   //Need to enable this first to access to the database
   ssl: env.db.ssl ? { rejectUnauthorized: false } : undefined,
 });
